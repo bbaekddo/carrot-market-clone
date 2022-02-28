@@ -1,0 +1,524 @@
+﻿-- 테이블 순서는 관계를 고려하여 한 번에 실행해도 에러가 발생하지 않게 정렬되었습니다.
+
+-- Locations Table Create SQL
+CREATE TABLE Locations
+(
+    `id`           BIGINT            NOT NULL    AUTO_INCREMENT COMMENT 'Location ID', 
+    `name`         VARCHAR(10)       NOT NULL    COMMENT '''~~동'' 까지 표시', 
+    `latitude`     DECIMAL(10, 7)    NOT NULL    COMMENT 'Latitude Degree', 
+    `longtitude`   DECIMAL(10, 7)    NOT NULL    COMMENT 'Longtitude Degree', 
+    `create_date`  TIMESTAMP         NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP         NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT           NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Locations COMMENT 'API 위치 정보';
+
+
+-- CategoryImages Table Create SQL
+CREATE TABLE CategoryImages
+(
+    `id`           SMALLINT     NOT NULL    AUTO_INCREMENT COMMENT 'Category Image ID', 
+    `data`         TEXT         NULL        DEFAULT NULL COMMENT 'Category Image URL', 
+    `create_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT      NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE CategoryImages COMMENT '상품 카테고리 일러스트 사진';
+
+
+-- ProfileImages Table Create SQL
+CREATE TABLE ProfileImages
+(
+    `id`           BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'Profile Image ID', 
+    `data`         TEXT         NULL        DEFAULT NULL COMMENT 'Profile Image URL', 
+    `create_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT      NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE ProfileImages COMMENT '사용자 프로필 사진';
+
+
+-- UserLocations Table Create SQL
+CREATE TABLE UserLocations
+(
+    `id`           BIGINT        NOT NULL    AUTO_INCREMENT COMMENT 'User Location ID', 
+    `location`     BIGINT        NOT NULL    COMMENT 'Location ID', 
+    `auth`         TINYINT(1)    NOT NULL    DEFAULT 0 COMMENT '0 : 미인증 / 1: 인증 완료', 
+    `auth_count`   INT           NOT NULL    DEFAULT 0 COMMENT 'Authentication Count', 
+    `create_date`  TIMESTAMP     NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP     NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT       NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE UserLocations COMMENT '사용자 위치 정보 및 인증 여부';
+
+ALTER TABLE UserLocations
+    ADD CONSTRAINT FK_UserLocations_location_Locations_id FOREIGN KEY (location)
+        REFERENCES Locations (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- Topics Table Create SQL
+CREATE TABLE Topics
+(
+    `id`           TINYINT         NOT NULL    AUTO_INCREMENT COMMENT 'Post Topic ID', 
+    `name`         VARCHAR(100)    NOT NULL    COMMENT 'Topic Name', 
+    `create_date`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT         NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Topics COMMENT '동네 정보 글 주제';
+
+
+-- Expressions Table Create SQL
+CREATE TABLE Expressions
+(
+    `id`           TINYINT      NOT NULL    AUTO_INCREMENT COMMENT 'Relate to Post ID', 
+    `content`      TEXT         NOT NULL    COMMENT 'Expression Data', 
+    `create_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT      NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Expressions COMMENT '동네 정보 글 공감하기';
+
+
+-- Categoires Table Create SQL
+CREATE TABLE Categoires
+(
+    `id`           TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'Item Category ID', 
+    `name`         VARCHAR(20)    NOT NULL    COMMENT 'Category Name', 
+    `image`        SMALLINT       NOT NULL    COMMENT 'Category Image ID', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Categoires COMMENT '상품 카테고리';
+
+ALTER TABLE Categoires
+    ADD CONSTRAINT FK_Categoires_image_CategoryImages_id FOREIGN KEY (image)
+        REFERENCES CategoryImages (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- Users Table Create SQL
+CREATE TABLE Users
+(
+    `id`                  VARCHAR(10)      NOT NULL    COMMENT 'User ID', 
+    `pwd`                 VARCHAR(200)     NOT NULL    COMMENT 'User Password', 
+    `name`                VARCHAR(10)      NOT NULL    COMMENT 'User Name', 
+    `nickname`            VARCHAR(20)      NOT NULL    COMMENT 'User Nickname', 
+    `profile_img`         BIGINT           NOT NULL    COMMENT 'Profile Image ID', 
+    `manner_temperature`  DECIMAL(3, 1)    NOT NULL    DEFAULT 36.5 COMMENT '0 ~ 99.9 Range', 
+    `retrade_rate`        TINYINT          NULL        DEFAULT NULL COMMENT 'Retrade Rate', 
+    `reply_rate`          TINYINT          NULL        DEFAULT NULL COMMENT 'Reply Rate', 
+    `location1`           BIGINT           NOT NULL    COMMENT 'User Location 1', 
+    `location2`           BIGINT           NOT NULL    COMMENT 'User Location 2', 
+    `create_date`         TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`         TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`              TINYINT          NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Users COMMENT '사용자 정보';
+
+ALTER TABLE Users
+    ADD CONSTRAINT FK_Users_profile_img_ProfileImages_id FOREIGN KEY (profile_img)
+        REFERENCES ProfileImages (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Users
+    ADD CONSTRAINT FK_Users_location1_UserLocations_id FOREIGN KEY (location1)
+        REFERENCES UserLocations (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Users
+    ADD CONSTRAINT FK_Users_location2_UserLocations_id FOREIGN KEY (location2)
+        REFERENCES UserLocations (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- BadgeImages Table Create SQL
+CREATE TABLE BadgeImages
+(
+    `id`           BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'Badge Image ID', 
+    `data`         TEXT         NULL        COMMENT 'Badge Image URL', 
+    `create_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT      NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE BadgeImages COMMENT '배지 일러스트 사진';
+
+
+-- UserMannerTypes Table Create SQL
+CREATE TABLE UserMannerTypes
+(
+    `id`           SMALLINT       NOT NULL    AUTO_INCREMENT COMMENT 'Manner Type ID', 
+    `content`      VARCHAR(30)    NOT NULL    COMMENT 'Manner Type Content', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE UserMannerTypes COMMENT '사용자 매너 후기 종류';
+
+
+-- Items Table Create SQL
+CREATE TABLE Items
+(
+    `id`            BIGINT           NOT NULL    AUTO_INCREMENT COMMENT 'Item Post ID', 
+    `seller`        VARCHAR(10)      NOT NULL    COMMENT 'Seller User ID', 
+    `name`          VARCHAR(50)      NOT NULL    COMMENT 'Item Name', 
+    `category`      TINYINT          NOT NULL    COMMENT 'Item Category', 
+    `content`       VARCHAR(1000)    NOT NULL    COMMENT 'Item Description', 
+    `price`         INT              NOT NULL    COMMENT 'KRW', 
+    `location`      BIGINT           NOT NULL    COMMENT 'Sale Location', 
+    `lookup_count`  SMALLINT         NOT NULL    DEFAULT 0 COMMENT 'Lookup Count', 
+    `proposal`      TINYINT(1)       NOT NULL    DEFAULT 0 COMMENT '0 : 제안 가능 / 1: 제안 불가', 
+    `create_date`   TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`   TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`        TINYINT          NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Items COMMENT '상품 판매글';
+
+ALTER TABLE Items
+    ADD CONSTRAINT FK_Items_seller_Users_id FOREIGN KEY (seller)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Items
+    ADD CONSTRAINT FK_Items_category_Categoires_id FOREIGN KEY (category)
+        REFERENCES Categoires (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Items
+    ADD CONSTRAINT FK_Items_location_Locations_id FOREIGN KEY (location)
+        REFERENCES Locations (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- Neighborhoods Table Create SQL
+CREATE TABLE Neighborhoods
+(
+    `id`           BIGINT           NOT NULL    AUTO_INCREMENT COMMENT 'Neighborhood Post ID', 
+    `user`         VARCHAR(10)      NOT NULL    COMMENT 'Created User ID', 
+    `location`     BIGINT           NOT NULL    COMMENT 'Location ID', 
+    `content`      VARCHAR(2000)    NOT NULL    COMMENT 'Post Content', 
+    `topic`        TINYINT          NOT NULL    COMMENT 'Post Topic ID', 
+    `expression`   TINYINT          NOT NULL    COMMENT 'Relate to Post ID', 
+    `create_date`  TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT          NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Neighborhoods COMMENT '동네 정보 글';
+
+ALTER TABLE Neighborhoods
+    ADD CONSTRAINT FK_Neighborhoods_user_Users_id FOREIGN KEY (user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Neighborhoods
+    ADD CONSTRAINT FK_Neighborhoods_location_Locations_id FOREIGN KEY (location)
+        REFERENCES Locations (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Neighborhoods
+    ADD CONSTRAINT FK_Neighborhoods_topic_Topics_id FOREIGN KEY (topic)
+        REFERENCES Topics (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Neighborhoods
+    ADD CONSTRAINT FK_Neighborhoods_expression_Expressions_id FOREIGN KEY (expression)
+        REFERENCES Expressions (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- BadgeTypes Table Create SQL
+CREATE TABLE BadgeTypes
+(
+    `id`           INT            NOT NULL    AUTO_INCREMENT COMMENT 'Badge Type ID', 
+    `name`         VARCHAR(10)    NOT NULL    COMMENT 'Badge Name', 
+    `content`      VARCHAR(50)    NOT NULL    COMMENT 'Badge Description', 
+    `image`        BIGINT         NOT NULL    COMMENT 'Bade Image ID', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE BadgeTypes COMMENT '배지 종류';
+
+ALTER TABLE BadgeTypes
+    ADD CONSTRAINT FK_BadgeTypes_image_BadgeImages_id FOREIGN KEY (image)
+        REFERENCES BadgeImages (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- Badges Table Create SQL
+CREATE TABLE Badges
+(
+    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'User Badge', 
+    `user`         VARCHAR(10)    NOT NULL    COMMENT 'User ID', 
+    `type`         INT            NOT NULL    COMMENT 'Badge Type', 
+    `check_gold`   TINYINT(1)     NOT NULL    DEFAULT 0 COMMENT '0: 일반 배지 / 1 : 황금 배지', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Badges COMMENT '사용자 배지 정보';
+
+ALTER TABLE Badges
+    ADD CONSTRAINT FK_Badges_user_Users_id FOREIGN KEY (user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Badges
+    ADD CONSTRAINT FK_Badges_type_BadgeTypes_id FOREIGN KEY (type)
+        REFERENCES BadgeTypes (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- NeighborhoodImages Table Create SQL
+CREATE TABLE NeighborhoodImages
+(
+    `id`           BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'Post Image ID', 
+    `post`         BIGINT       NOT NULL    COMMENT 'Neighborhood Post ID', 
+    `data`         TEXT         NULL        DEFAULT NULL COMMENT 'Post Image URL', 
+    `create_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP    NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT      NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE NeighborhoodImages COMMENT '동네 정보 글 사진';
+
+ALTER TABLE NeighborhoodImages
+    ADD CONSTRAINT FK_NeighborhoodImages_post_Neighborhoods_id FOREIGN KEY (post)
+        REFERENCES Neighborhoods (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- Comments Table Create SQL
+CREATE TABLE Comments
+(
+    `id`             BIGINT           NOT NULL    AUTO_INCREMENT COMMENT 'Comment ID', 
+    `post`           BIGINT           NOT NULL    COMMENT 'Neighborhood Post ID', 
+    `user`           VARCHAR(10)      NOT NULL    COMMENT 'Created User ID', 
+    `content`        VARCHAR(1000)    NOT NULL    COMMENT 'Comment Content', 
+    `thumbup_count`  SMALLINT         NOT NULL    DEFAULT 0 COMMENT 'Thumb up Count', 
+    `create_date`    TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`    TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`         TINYINT          NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Comments COMMENT '사용자 댓글';
+
+ALTER TABLE Comments
+    ADD CONSTRAINT FK_Comments_post_Neighborhoods_id FOREIGN KEY (post)
+        REFERENCES Neighborhoods (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Comments
+    ADD CONSTRAINT FK_Comments_user_Users_id FOREIGN KEY (user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- BuyItems Table Create SQL
+CREATE TABLE BuyItems
+(
+    `id`            BIGINT           NOT NULL    AUTO_INCREMENT COMMENT 'Buying Item Post ID', 
+    `buyer`         VARCHAR(10)      NOT NULL    COMMENT 'Buyer User ID', 
+    `name`          VARCHAR(50)      NOT NULL    COMMENT 'Buying Item Name', 
+    `category`      TINYINT          NOT NULL    COMMENT 'Item Category', 
+    `content`       VARCHAR(1000)    NOT NULL    COMMENT 'Item Description', 
+    `lookup_count`  SMALLINT         NOT NULL    DEFAULT 0 COMMENT 'Lookup Count', 
+    `create_date`   TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`   TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`        TINYINT          NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE BuyItems COMMENT '상품 구매글';
+
+ALTER TABLE BuyItems
+    ADD CONSTRAINT FK_BuyItems_buyer_Users_id FOREIGN KEY (buyer)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE BuyItems
+    ADD CONSTRAINT FK_BuyItems_category_Categoires_id FOREIGN KEY (category)
+        REFERENCES Categoires (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- ItemImages Table Create SQL
+CREATE TABLE ItemImages
+(
+    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Item Image ID', 
+    `item`         BIGINT         NOT NULL    COMMENT 'Item Post ID', 
+    `seller`       VARCHAR(10)    NOT NULL    COMMENT 'Seller User ID', 
+    `data`         TEXT           NULL        DEFAULT NULL COMMENT 'Item Image URL', 
+    `title_image`  TINYINT(1)     NOT NULL    DEFAULT 0 COMMENT '0 : 일반 사진 / 1 : 대표 사진', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE ItemImages COMMENT '상품 사진';
+
+ALTER TABLE ItemImages
+    ADD CONSTRAINT FK_ItemImages_item_Items_id FOREIGN KEY (item)
+        REFERENCES Items (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE ItemImages
+    ADD CONSTRAINT FK_ItemImages_seller_Users_id FOREIGN KEY (seller)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- Watchlists Table Create SQL
+CREATE TABLE Watchlists
+(
+    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Watchlist ID', 
+    `item`         BIGINT         NOT NULL    COMMENT 'Watchlist Item Post ID', 
+    `buyer`        VARCHAR(10)    NOT NULL    COMMENT 'Buyer User ID', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Watchlists COMMENT '관심 목록';
+
+ALTER TABLE Watchlists
+    ADD CONSTRAINT FK_Watchlists_item_Items_id FOREIGN KEY (item)
+        REFERENCES Items (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Watchlists
+    ADD CONSTRAINT FK_Watchlists_buyer_Users_id FOREIGN KEY (buyer)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- CompleteItems Table Create SQL
+CREATE TABLE CompleteItems
+(
+    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Complete Item Post ID', 
+    `item`         BIGINT         NOT NULL    COMMENT 'Item Post ID', 
+    `seller`       VARCHAR(10)    NOT NULL    COMMENT 'Seller User ID', 
+    `buyer`        VARCHAR(10)    NOT NULL    COMMENT 'Buyer User ID', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Complete / 2 : Hide / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE CompleteItems COMMENT '거래 완료 상품';
+
+ALTER TABLE CompleteItems
+    ADD CONSTRAINT FK_CompleteItems_item_Items_id FOREIGN KEY (item)
+        REFERENCES Items (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE CompleteItems
+    ADD CONSTRAINT FK_CompleteItems_seller_Users_id FOREIGN KEY (seller)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE CompleteItems
+    ADD CONSTRAINT FK_CompleteItems_buyer_Users_id FOREIGN KEY (buyer)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- UserReviews Table Create SQL
+CREATE TABLE UserReviews
+(
+    `id`            BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'Review ID', 
+    `receive_user`  VARCHAR(10)     NOT NULL    COMMENT 'Review Received User', 
+    `send_user`     VARCHAR(10)     NOT NULL    COMMENT 'Review Sent User', 
+    `content`       VARCHAR(100)    NOT NULL    COMMENT 'Review Content', 
+    `create_date`   TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`   TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`        TINYINT         NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE UserReviews COMMENT '사용자 거래 후기';
+
+ALTER TABLE UserReviews
+    ADD CONSTRAINT FK_UserReviews_receive_user_Users_id FOREIGN KEY (receive_user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE UserReviews
+    ADD CONSTRAINT FK_UserReviews_send_user_Users_id FOREIGN KEY (send_user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- UserManners Table Create SQL
+CREATE TABLE UserManners
+(
+    `id`            BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Manner Review ID', 
+    `receive_user`  VARCHAR(10)    NOT NULL    COMMENT 'Manner Received User', 
+    `send_user`     VARCHAR(10)    NOT NULL    COMMENT 'Manner Sent User', 
+    `manner`        SMALLINT       NOT NULL    COMMENT 'Manner Type ID', 
+    `create_date`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`        TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE UserManners COMMENT '사용자 매너 후기';
+
+ALTER TABLE UserManners
+    ADD CONSTRAINT FK_UserManners_manner_UserMannerTypes_id FOREIGN KEY (manner)
+        REFERENCES UserMannerTypes (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE UserManners
+    ADD CONSTRAINT FK_UserManners_receive_user_Users_id FOREIGN KEY (receive_user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE UserManners
+    ADD CONSTRAINT FK_UserManners_send_user_Users_id FOREIGN KEY (send_user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- Notices Table Create SQL
+CREATE TABLE Notices
+(
+    `id`           BIGINT           NOT NULL    AUTO_INCREMENT COMMENT 'Notice ID', 
+    `title`        VARCHAR(100)     NOT NULL    COMMENT 'Notice Title', 
+    `content`      VARCHAR(2000)    NOT NULL    COMMENT 'Notice Content', 
+    `create_date`  TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT          NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Notices COMMENT '공지사항';
+
+
+-- Keywords Table Create SQL
+CREATE TABLE Keywords
+(
+    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Keyword ID', 
+    `user`         VARCHAR(10)    NOT NULL    COMMENT 'User ID', 
+    `word`         VARCHAR(30)    NOT NULL    COMMENT 'Keywords', 
+    `item`         BIGINT         NOT NULL    COMMENT 'Item Post ID', 
+    `catch`        TINYINT        NOT NULL    DEFAULT 0 COMMENT '0 : Fail / 1 : Success', 
+    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       TINYINT        NOT NULL    DEFAULT 1 COMMENT '1 : Run(Normal) / 2 : Stop / 3 : Deleted', 
+     PRIMARY KEY (id)
+);
+
+ALTER TABLE Keywords COMMENT '키워드 알림';
+
+ALTER TABLE Keywords
+    ADD CONSTRAINT FK_Keywords_user_Users_id FOREIGN KEY (user)
+        REFERENCES Users (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE Keywords
+    ADD CONSTRAINT FK_Keywords_item_Items_id FOREIGN KEY (item)
+        REFERENCES Items (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
