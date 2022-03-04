@@ -30,23 +30,24 @@ module.exports = function(app){
     app.patch('/app/users/:userIdx', user.patchUsers);
     
     // 8. 사용자 프로필 사진 생성
-    app.post('/app/users/images', user.postImages);
+    // --> 사용 안함
+    // app.post('/app/users/images', user.postImages);
     
-    // 9. 전체/특정 사용자 프로필 사진 조회
-    app.get('/app/users/images', user.getImages);
+    // 9. 특정 사용자 프로필 사진 조회
+    app.get('/app/users/images/:imageId', user.getImages);
     
     // 10. 특정 사용자 프로필 사진 수정/삭제
-    app.put('/app/users/images/:imageId', user.putImages);
+    app.patch('/app/users/images/:imageId', user.patchImages);
     
     // 11. 사용자 위치 정보 생성
-    app.post('/app/users/locations',user.postLocations);
+    // --> 사용 안함
+    // app.post('/app/users/locations',user.postLocations);
     
     // 12. 전체/특정 사용자 위치 정보 조회
-    app.get('/app/users/locations', user.getLocations);
+    app.get('/app/users/locations/:locationId', user.getLocations);
     
     // 13. 특정 사용자 위치 정보 수정/삭제
     app.patch('/app/users/locations/:locationId', user.patchLocations);
-    
     
     // TODO: After 로그인 인증 방법 (JWT)
     // 로그인 하기 API (JWT 생성)

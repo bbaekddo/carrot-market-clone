@@ -142,7 +142,6 @@ exports.getUserByNickname = async function (req, res) {
      * Path Variable: userNickname
      */
     const userNickname = req.params.userNickname;
-    console.log(userNickname);
     
     if (!userNickname) return res.send(errResponse(baseResponse.USER_USERNICKNAME_EMPTY));
     
@@ -229,23 +228,21 @@ exports.patchUsers = async function (req, res) {
  * API Name : 사용자 프로필 사진 생성
  * [POST] /app/users/images
  */
-exports.postImages = async function (req, res) {
+/*exports.postImages = async function (req, res) {
     
-    /**
+    /!**
      * Body: data
-     */
-    const data = req.body;
+     *!/
+    const data = req.body.imageURL;
     
     // 형식 체크 (by 정규표현식)
     if (typeof data != 'string')
-        return res.send(response(baseResponse.USER_IMAGE_NOT_MATCH));
+        return res.send(errResponse(baseResponse.USER_IMAGE_NOT_MATCH));
     
-    const imageUpResponse = await userService.createUserImage(
-        data
-    );
+    const imageUpResponse = await userService.createUserImage(data);
     
     return res.send(imageUpResponse);
-};
+};*/
 
 
 /**
@@ -258,7 +255,7 @@ exports.getImages = async function (req, res) {
     /**
      * Query String: userImageId
      */
-    const userImageId = req.query.id;
+    const userImageId = req.params.imageId;
     
     if (!userImageId) {
         // 프로필 사진 전체 조회
@@ -266,7 +263,7 @@ exports.getImages = async function (req, res) {
         return res.send(response(baseResponse.SUCCESS, userImageListResult));
     } else {
         // 프로필 사진 검색 조회
-        const userImageListByImageId = await userProvider.retrieveUserImageList(userImageId);
+        const userImageListByImageId = await userProvider.retrieveUserImageListByImageId(userImageId);
         return res.send(response(baseResponse.SUCCESS, userImageListByImageId));
     }
 };
@@ -276,12 +273,12 @@ exports.getImages = async function (req, res) {
  * API Name : 특정 사용자 프로필 사진 수정/삭제
  * [PUT] /app/users/images/:imageId
  */
-exports.putImages = async function (req, res) {
+exports.patchImages = async function (req, res) {
     
-    const userImageId = req.params.userImageId;
+    const userImageId = req.params.imageId;
     const userImageData = req.body.data;
     
-    const editUserImage = await userService.editUserImage(userImageData);
+    const editUserImage = await userService.editUserImage(userImageId, userImageData);
     
     return res.send(editUserImage);
 };
@@ -291,11 +288,11 @@ exports.putImages = async function (req, res) {
  * API Name : 사용자 위치 정보 생성
  * [POST] /app/users/locations
  */
-exports.postLocations = async function (req, res) {
+/*exports.postLocations = async function (req, res) {
     
-    /**
+    /!**
      * Body: auth, auth_count
-     */
+     *!/
     const {auth, auth_count} = req.body;
     
     // 형식 체크 (by 정규표현식)
@@ -310,7 +307,7 @@ exports.postLocations = async function (req, res) {
     );
     
     return res.send(locationUpResponse);
-};
+};*/
 
 /**
  * API No. 12
@@ -322,7 +319,7 @@ exports.getLocations = async function (req, res) {
     /**
      * Query String: userLocationId
      */
-    const userLocationId = req.query.id;
+    const userLocationId = req.params.locationId;
     
     if (!userLocationId) {
         //  사용자 위치 전체 조회
@@ -330,7 +327,7 @@ exports.getLocations = async function (req, res) {
         return res.send(response(baseResponse.SUCCESS, userLocationListResult));
     } else {
         // 사용자 위치 검색 조회
-        const userLocationListByLocationId = await userProvider.retrieveUserLocationList(userLocationId);
+        const userLocationListByLocationId = await userProvider.retrieveUserLocationListByLocationId(userLocationId);
         return res.send(response(baseResponse.SUCCESS, userLocationListByLocationId));
     }
 };
@@ -342,11 +339,12 @@ exports.getLocations = async function (req, res) {
  */
 exports.patchLocations = async function (req, res) {
     
-    const locationId = req.params.locationId;
-    const locationAuth = req.body.auth;
-    const locationAuthCount = req.body.auth_count;
+    const userLocationId = req.params.locationId;
+    const userLocation = req.body.location;
+    const userLocationAuth = req.body.auth;
+    const userLocationAuthCount = req.body.auth_count;
     
-    const editUserLocation = await userService.editUserLocation(locationAuth, locationAuthCount);
+    const editUserLocation = await userService.editUserLocation(userLocationId, userLocation, userLocationAuth, userLocationAuthCount);
     
     return res.send(editUserLocation);
 };

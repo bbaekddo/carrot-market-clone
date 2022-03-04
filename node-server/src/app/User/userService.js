@@ -33,6 +33,7 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
         const connection2 = await pool.getConnection(async (conn) => conn);
         const connection3 = await pool.getConnection(async (conn) => conn);
         const connection4 = await pool.getConnection(async (conn) => conn);
+        const connection5 = await pool.getConnection(async (conn) => conn);
         // 사용자 위치1 생성 후 id 값 받기
         const userLocation1 = await userDao.insertUserLocation(connection1, location);
         // 사용자 위치2는 미정으로 생성 후 id 값 받기
@@ -42,19 +43,24 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
         
         const insertUserInfoParams = [id, pswd, name, nickname, userProfile_img, userLocation1, userLocation2];
         const insertUserResult = await userDao.insertUserInfo(connection4, insertUserInfoParams);
+        const insertUserInfo = await userDao.selectUserIndex(connection5, insertUserResult);
         
-        console.log(`추가된 사용자 Index : ${insertUserResult}`)
-    
         connection1.release();
         connection2.release();
         connection3.release();
         connection4.release();
-        return response(baseResponse.SUCCESS);
+        connection4.release();
+        
+        return response(baseResponse.SUCCESS, insertUserInfo);
+        
     } catch (err) {
         logger.error(`App - createUser Service error\n: ${err.message}`);
+        
         return errResponse(baseResponse.DB_ERROR);
+        
     }
 };
+
 
 
 // TODO: After 로그인 인증 방법 (JWT)
@@ -112,19 +118,55 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
 
 exports.editUser = async function (idx, id, pswd, name, nickname) {
     try {
-        console.log(`수정할 사용자 : ${id}`);
         const connection1 = await pool.getConnection(async (conn) => conn);
         const connection2 = await pool.getConnection(async (conn) => conn);
+        const connection3 = await pool.getConnection(async (conn) => conn);
         const oldPatches = await userDao.selectUserPatch(connection1, idx);
         const newPatches = [id, pswd, name, nickname];
-        const editUserResult = await userDao.updateUser(connection2, idx, oldPatches, newPatches);
+        await userDao.updateUser(connection2, idx, oldPatches, newPatches);
+        const editUserResult = await userDao.selectUserIndex(connection3, idx);
         connection1.release();
         connection2.release();
+        connection3.release();
 
         return response(baseResponse.SUCCESS, editUserResult);
 
     } catch (err) {
         logger.error(`App - editUser Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+}
+
+exports.editUserImage = async function (userImageId, userImageData) {
+    try {
+        const connection1 = await pool.getConnection(async (conn) => conn);
+        const connection2 = await pool.getConnection(async (conn) => conn);
+        await userDao.updateImage(connection1, userImageId, userImageData);
+        const editImageResult = await userDao.selectUserImageByImageId(connection2, userImageId);
+        connection1.release();
+        connection2.release();
+        
+        return response(baseResponse.SUCCESS, editImageResult);
+        
+    } catch (err) {
+        logger.error(`App - editUserImage Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+}
+
+exports.editUserLocation = async function (userLocationId, userLocation, userLocationAuth, userLocationAuthCount) {
+    try {
+        const connection1 = await pool.getConnection(async (conn) => conn);
+        const connection2 = await pool.getConnection(async (conn) => conn);
+        await userDao.updateLocation(connection1, userLocationId, userLocation, userLocationAuth, userLocationAuthCount);
+        const editLocationResult = await userDao.selectUserLocationByLocationId(connection2, userLocationId);
+        connection1.release();
+        connection2.release();
+        
+        return response(baseResponse.SUCCESS, editLocationResult);
+        
+    } catch (err) {
+        logger.error(`App - editUserLocation Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
     }
 }

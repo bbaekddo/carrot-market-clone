@@ -62,3 +62,35 @@ exports.userNicknameCheck = async function (userNickname) {
     
     return userNicknameCheckResult;
 };
+
+exports.retrieveUserImageList = async function () {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const userImageListResult = await userDao.selectUserImage(connection);
+    connection.release();
+    
+    return userImageListResult;
+};
+
+exports.retrieveUserImageListByImageId = async function (userImageId) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const userImageListByImageId = await userDao.selectUserImageByImageId(connection, userImageId);
+    connection.release();
+    
+    return userImageListByImageId;
+};
+
+exports.retrieveUserLocationList = async function () {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const userLocationListResult = await userDao.selectUserLocation(connection);
+    connection.release();
+    
+    return userLocationListResult;
+};
+
+exports.retrieveUserLocationListByLocationId = async function (userLocationId) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const userLocationListByLocationId = await userDao.selectUserLocationByLocationId(connection, userLocationId);
+    connection.release();
+    
+    return userLocationListByLocationId;
+};
