@@ -37,12 +37,13 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
         const userLocation1 = await userDao.insertUserLocation(connection1, location);
         // 사용자 위치2는 미정으로 생성 후 id 값 받기
         const userLocation2 = await userDao.insertUserLocation(connection2, 1);
+        // 사용자 프로필 사진 id 값 받기
         const userProfile_img = await userDao.insertUserImage(connection3);
         
         const insertUserInfoParams = [id, pswd, name, nickname, userProfile_img, userLocation1, userLocation2];
         const insertUserResult = await userDao.insertUserInfo(connection4, insertUserInfoParams);
         
-        console.log(`추가된 사용자 Index : ${insertUserResult[0]}`)
+        console.log(`추가된 사용자 Index : ${insertUserResult}`)
     
         connection1.release();
         connection2.release();
@@ -111,12 +112,16 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
 
 exports.editUser = async function (idx, id, pswd, name, nickname) {
     try {
-        console.log(`수정할 사용자 : ${idx}`);
-        const connection = await pool.getConnection(async (conn) => conn);
-        const editUserResult = await userDao.updateUser(connection, idx, id, pswd, name, nickname)
-        connection.release();
+        console.log(`수정할 사용자 : ${id}`);
+        const connection1 = await pool.getConnection(async (conn) => conn);
+        const connection2 = await pool.getConnection(async (conn) => conn);
+        const oldPatches = await userDao.selectUserPatch(connection1, idx);
+        const newPatches = [id, pswd, name, nickname];
+        const editUserResult = await userDao.updateUser(connection2, idx, oldPatches, newPatches);
+        connection1.release();
+        connection2.release();
 
-        return response(baseResponse.SUCCESS);
+        return response(baseResponse.SUCCESS, editUserResult);
 
     } catch (err) {
         logger.error(`App - editUser Service error\n: ${err.message}`);

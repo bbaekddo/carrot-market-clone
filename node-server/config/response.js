@@ -1,4 +1,4 @@
-const response = isSuccess => {
+const response = ({isSuccess, code, message}, result) => {
    return {
         isSuccess: isSuccess,
         code: code,
@@ -7,12 +7,12 @@ const response = isSuccess => {
    }
   };
 
-  const errResponse = ({isSuccess, code, message}) => {
+const errResponse = ({isSuccess, code, message}) => {
     return {
         isSuccess: isSuccess,
         code: code,
         message: message
-      }
-  };
+    }
+};
   
   module.exports = { response, errResponse };

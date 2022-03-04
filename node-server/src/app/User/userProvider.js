@@ -6,20 +6,11 @@ const userDao = require("./userDao");
 // Provider: Read 비즈니스 로직 처리
 
 exports.retrieveUserList = async function (idx) {
-  if (!idx) {
     const connection = await pool.getConnection(async (conn) => conn);
     const userListResult = await userDao.selectUser(connection);
     connection.release();
-
+    
     return userListResult;
-
-  } else {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userListResult = await userDao.selectUserIndex(connection, idx);
-    connection.release();
-
-    return userListResult;
-  }
 };
 
 exports.retrieveUserById = async function (userId) {
@@ -27,15 +18,16 @@ exports.retrieveUserById = async function (userId) {
   const userIdResult = await userDao.selectUserId(connection, userId);
   connection.release();
 
-  return userIdResult[0];
+  return userIdResult;
 };
 
+// 사용 안함
 exports.retrieveUserByNickname = async function (userNickname) {
     const connection = await pool.getConnection(async (conn) => conn);
     const userNicknameResult = await userDao.selectUserNickname(connection, userNickname);
     connection.release();
     
-    return userNicknameResult[0];
+    return userNicknameResult;
 };
 
 exports.retrieveUserListByName = async function (userName) {

@@ -38,6 +38,7 @@ async function selectUserId(connection, userId) {
 
 
 // 닉네임으로 사용자 조회
+// 사용안함
 async function selectUserNickname(connection, userNickname) {
     const selectUserNicknameQuery = `
                 SELECT idx, id, name, nickname, profile_img,
@@ -106,17 +107,17 @@ async function insertUserLocation(connection, userLocation) {
                 VALUES (?);
                 `;
     const userLocationId = await connection.query(insertUserLocationQuery, userLocation);
-    return userLocationId[0];
+    return userLocationId[0].insertId;
 }
 
 // 사용자 프로필 사진 생성
 async function insertUserImage(connection) {
     const insertUserImageQuery = `
-                INSERT INTO UserLocations(data)
-                VALUES ('NULL');
+                INSERT INTO ProfileImages()
+                VALUES ();
                 `;
     const userImageId = await connection.query(insertUserImageQuery);
-    return userImageId[0];
+    return userImageId[0].insertId;
 }
 
 // 사용자 생성
@@ -125,7 +126,8 @@ async function insertUserInfo(connection, insertUserInfoParams) {
                 INSERT INTO Users(id, pswd, name, nickname, profile_img, location1, location2)
                 VALUES (?, ?, ?, ?, ?, ?, ?);
                 `;
-    return await connection.query(insertUserInfoQuery, insertUserInfoParams);
+    const userInfo = await connection.query(insertUserInfoQuery, insertUserInfoParams);
+    return userInfo[0].insertId;
 }
 
 // 패스워드 체크
@@ -147,7 +149,8 @@ async function selectUserAccount(connection, email) {
     const selectUserAccountQuery = `
         SELECT status, id
         FROM UserInfo 
-        WHERE email = ?;`;
+        WHERE email = ?;
+        `;
     const selectUserAccountRow = await connection.query(
         selectUserAccountQuery,
         email
@@ -155,54 +158,69 @@ async function selectUserAccount(connection, email) {
     return selectUserAccountRow[0];
 }
 
-async function updateUser(connection, idx, id, pswd, name, nickname) {
-    const startQuery = '`UPDATE Users SET ';
-    let idQuery, pswdQuery, nameQuery, nicknameQuery;
+// 사용자 정보 불러오기
+async function selectUserPatch(connection, idx){
+    const selectUserPatchQuery = `
+        SELECT id, pswd, name, nickname
+        FROM Users
+        WHERE Users.idx = ?;
+        `;
+    const [selectUserPatchRow] = await connection.query(selectUserPatchQuery, idx);
+    const id = selectUserPatchRow[0].id;
+    const pswd = selectUserPatchRow[0].pswd;
+    const name = selectUserPatchRow[0].name;
+    const nickname = selectUserPatchRow[0].nickname;
     
-    // id 값 변경
-    if (id != null) {
-        idQuery = 'id = ${id}, ';
-    } else {
-        idQuery = '';
+    return [id, pswd, name, nickname];
+}
+
+// 사용자 정보 수정
+async function updateUser(connection, idx, oldPatches, newPatches) {
+    let id, pswd, name, nickname;
+    
+    if (newPatches[0] != null) {
+        id = newPatches[0];
+    } else{
+        id = oldPatches[0];
     }
     
-    // pswd 값 변경
-    if (pswd != null) {
-        pswdQuery = 'pswd = ${pswd}, ';
-    } else {
-        pswdQuery = '';
+    if (newPatches[1] != null) {
+        pswd = newPatches[1];
+    } else{
+        pswd = oldPatches[1];
     }
     
-    // name 값 변경
-    if (name != null) {
-        nameQuery = 'name = ${name}, ';
-    } else {
-        nameQuery = '';
+    if (newPatches[2] != null) {
+        name = newPatches[2];
+    } else{
+        name = oldPatches[2];
     }
     
-    // nickname 값 변경
-    if (nickname != null) {
-        nicknameQuery = 'nickname = ${nickname} ';
-    } else {
-        nicknameQuery = '';
+    if (newPatches[3] != null) {
+        nickname = newPatches[3];
+    } else{
+        nickname = oldPatches[3];
     }
+    const updatePathes = [id, pswd, name, nickname];
+    const updateUserQuery = `
+        UPDATE Users SET
+        id = ?, pswd = ?, name = ?, nickname = ?
+        WHERE Users.idx = ${idx};
+        `;
     
-    const lastQuery = 'WHERE idx = ?;`;';
-    const updateUserQuery = startQuery + idQuery + pswdQuery + nameQuery + nicknameQuery + lastQuery;
-    const updateUserRow = await connection.query(updateUserQuery, idx);
-    return updateUserRow[0];
+    await connection.query(updateUserQuery, updatePathes);
 }
 
 
 module.exports = {
     selectUser,
-    selectUserIndex,
     selectUserId,
     selectUserNickname,
     selectUserName,
     selectUserStatus,
     selectUserIdCheck,
     selectUserNicknameCheck,
+    selectUserPatch,
     insertUserLocation,
     insertUserImage,
     insertUserInfo,

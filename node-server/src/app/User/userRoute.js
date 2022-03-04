@@ -1,3 +1,4 @@
+const user = require("./userController");
 module.exports = function(app){
     const user = require('./userController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
@@ -8,20 +9,22 @@ module.exports = function(app){
     // 1. 사용자 생성 (회원가입)
     app.post('/app/users', user.postUsers);
 
-    // 2. 전체 사용자 조회
-    app.get('/app/users',user.getUsers);
+    // 2. 전체/특정 사용자 조회
+    app.get('/app/users', user.getUsers);
     
     // 3. 특정 id로 사용자 조회
     app.get('/app/users/:userId', user.getUserById);
     
     // 4. 특정 닉네임으로 사용자 조회
-    app.get('/app/users/:userNickname', user.getUserByNickname);
+    app.get('/app/users/nicknames/:userNickname', user.getUserByNickname);
     
     // 5. 특정 이름으로 사용자 조회
-    app.get('/app/users/?name=userName', user.getUserByName);
+    // --> 사용 안함
+    // app.get('/app/users/names', user.getUserByName);
     
     // 6. 특정 상태로 사용자 조회
-    app.get('/app/users/?status=userStatus',user.getUserByStatus);
+    // --> 사용 안함
+    // app.get('/app/users/?status=userStatus',user.getUserByStatus);
     
     // 7. 특정 사용자 수정/삭제
     app.patch('/app/users/:userIdx', user.patchUsers);

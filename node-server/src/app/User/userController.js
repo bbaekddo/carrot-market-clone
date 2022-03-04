@@ -6,6 +6,7 @@ const {response, errResponse} = require("../../../config/response");
 
 const regexEmail = require("regex-email");
 const {emit} = require("nodemon");
+const {log} = require("winston");
 
 // 특수문자 포함 여부 검증
 function containsSpecialChars(str) {
@@ -36,37 +37,37 @@ exports.postUsers = async function (req, res) {
 
     // 빈 값 체크
     if (!id)
-        return res.send(response(baseResponse.SIGNUP_ID_EMPTY));
+        return res.send(errResponse(baseResponse.SIGNUP_ID_EMPTY));
     
     if (!pswd)
-        return res.send(response(baseResponse.SIGNUP_PASSWORD_EMPTY));
+        return res.send(errResponse(baseResponse.SIGNUP_PASSWORD_EMPTY));
     
     if (!name)
-        return res.send(response(baseResponse.SIGNUP_NAME_EMPTY));
+        return res.send(errResponse(baseResponse.SIGNUP_NAME_EMPTY));
     
     if (!nickname)
-        return res.send(response(baseResponse.SIGNUP_NICKNAME_EMPTY));
+        return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
     
     // 길이 체크
     if (id.length > 20)
-        return res.send(response(baseResponse.SIGNUP_ID_LENGTH));
+        return res.send(errResponse(baseResponse.SIGNUP_ID_LENGTH));
     
     if (pswd.length < 8 || pswd.length > 20)
-        return res.send(response(baseResponse.SIGNUP_ID_LENGTH));
+        return res.send(errResponse(baseResponse.SIGNUP_ID_LENGTH));
     
     if (name.length > 10)
-        return res.send(response(baseResponse.SIGNUP_NAME_LENGTH));
+        return res.send(errResponse(baseResponse.SIGNUP_NAME_LENGTH));
     
     if (nickname.length > 20)
-        return res.send(response(baseResponse.SIGNUP_NICKNAME_LENGTH));
+        return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_LENGTH));
     
     // 문자열 체크 (특수문자 포함 여부)
     if (containsSpecialChars(id))
-        return res.send(response(baseResponse.SIGNUP_ID_CHARACTER));
+        return res.send(errResponse(baseResponse.SIGNUP_ID_CHARACTER));
     if (containsSpecialChars(name))
-        return res.send(response(baseResponse.SIGNUP_NAME_CHARACTER));
+        return res.send(errResponse(baseResponse.SIGNUP_NAME_CHARACTER));
     if (containsSpecialChars(nickname))
-        return res.send(response(baseResponse.SIGNUP_NICKNAME_CHARACTER));
+        return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_CHARACTER));
 
 
     const signUpResponse = await userService.createUser(
@@ -86,20 +87,28 @@ exports.postUsers = async function (req, res) {
  * [GET] /app/users
  */
 exports.getUsers = async function (req, res) {
-
-    /**
-     * Query String: idx
-     */
-    const idx = req.query.idx;
-
-    if (!idx) {
-        // 유저 전체 조회
-        const userListResult = await userProvider.retrieveUserList();
-        return res.send(response(baseResponse.SUCCESS, userListResult));
+    
+    const userName = req.query.name;
+    const userStatus = req.query.status;
+    
+    if (!userName) {
+        if (!userStatus) {
+            // 사용자 전체 조회
+            const userList = await userProvider.retrieveUserList();
+    
+            return res.send(response(baseResponse.SUCCESS, userList));
+            
+        } else{
+            // 계정 상태로 사용자 조회
+            const userListByUserStatus = await userProvider.retrieveUserListByStatus(userStatus);
+            
+            return res.send(response(baseResponse.SUCCESS, userListByUserStatus));
+            
+        }
     } else {
-        // 유저 검색 조회
-        const userListByIdx = await userProvider.retrieveUserList(idx);
-        return res.send(response(baseResponse.SUCCESS, userListByIdx));
+        // 이름으로 사용자 조회
+        const userListByName = await userProvider.retrieveUserListByName(userName);
+        return res.send(response(baseResponse.SUCCESS, userListByName));
     }
 };
 
@@ -118,6 +127,7 @@ exports.getUserById = async function (req, res) {
     if (!userId) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
 
     const userByUserId = await userProvider.retrieveUserById(userId);
+    
     return res.send(response(baseResponse.SUCCESS, userByUserId));
 };
 
@@ -132,6 +142,7 @@ exports.getUserByNickname = async function (req, res) {
      * Path Variable: userNickname
      */
     const userNickname = req.params.userNickname;
+    console.log(userNickname);
     
     if (!userNickname) return res.send(errResponse(baseResponse.USER_USERNICKNAME_EMPTY));
     
@@ -144,12 +155,16 @@ exports.getUserByNickname = async function (req, res) {
  * API Name : 특정 이름으로 사용자 조회
  * [GET] /app/users/?name=userName
  */
+/*
 exports.getUserByName = async function (req, res) {
     
-    /**
+    /!**
      * Query String: userName
-     */
-    const userName = req.query.userName;
+     *!/
+    
+    console.log("Hello");
+    const userName = req.query.name;
+    console.log(userName);
     
     if (!userName) {
         return res.send(errResponse(baseResponse.USER_USERNAME_EMPTY));
@@ -159,24 +174,27 @@ exports.getUserByName = async function (req, res) {
         return res.send(response(baseResponse.SUCCESS, userListByName));
     }
 };
+*/
 
 /**
  * API No. 6
  * API Name : 특정 상태로 사용자 조회
  * [GET] /app/users/?status=userStatus
  */
+/*
 exports.getUserByStatus = async function (req, res) {
     
-    /**
+    /!**
      * Query String: userStatus
-     */
-    const userStatus = req.params.userStatus;
+     *!/
+    const userStatus = req.query.userStatus;
     
     if (!userStatus) return res.send(errResponse(baseResponse.USER_USERSTATUS_EMPTY));
     
     const userByUserStatus = await userProvider.retrieveUser(userStatus);
     return res.send(response(baseResponse.SUCCESS, userByUserStatus));
 };
+*/
 
 /**
  * API No. 7
