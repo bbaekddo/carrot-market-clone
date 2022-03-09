@@ -85,8 +85,8 @@ async function selectUserIdCheck(connection, userId) {
                 WHERE Users.id = ?
                 AND Users.status != ?
                 `;
-    const [userIdCheckRow] = await connection.query(selectUserIdCheckQuery, [userId, 'Deleted']);
-    return userIdCheckRow;
+    const idCheckRow = await connection.query(selectUserIdCheckQuery, [userId, 'DELETED']);
+    return idCheckRow[0];
 }
 
 async function selectUserNicknameCheck(connection, userNickname) {
@@ -96,8 +96,8 @@ async function selectUserNicknameCheck(connection, userNickname) {
                 WHERE Users.nickname = ?
                 AND Users.status != ?
                 `;
-    const [userNicknameCheckRow] = await connection.query(selectUserNicknameCheckQuery, [userNickname, 'Deleted']);
-    return userNicknameCheckRow;
+    const nickNameCheckRow = await connection.query(selectUserNicknameCheckQuery, [userNickname, 'DELETED']);
+    return nickNameCheckRow[0];
 }
 
 // 사용자 위치 생성
@@ -130,32 +130,26 @@ async function insertUserInfo(connection, insertUserInfoParams) {
     return userInfo[0].insertId;
 }
 
-// 패스워드 체크
+// 사용자 패스워드 체크
 async function selectUserPassword(connection, selectUserPasswordParams) {
     const selectUserPasswordQuery = `
-                SELECT email, nickname, password
-                FROM UserInfo
-                WHERE email = ? AND password = ?;`;
-    const selectUserPasswordRow = await connection.query(
-                selectUserPasswordQuery,
-                selectUserPasswordParams
-    );
-    
-    return selectUserPasswordRow;
+                SELECT idx, id, pswd, nickname
+                FROM Users
+                WHERE id = ? AND pswd = ?;
+                `;
+    const passwordCheckRow = await connection.query(selectUserPasswordQuery, selectUserPasswordParams);
+    return passwordCheckRow[0];
 }
 
 // 유저 계정 상태 체크 (jwt 생성 위해 id 값도 가져온다.)
-async function selectUserAccount(connection, email) {
+async function selectUserAccount(connection, userId) {
     const selectUserAccountQuery = `
-        SELECT status, id
-        FROM UserInfo 
-        WHERE email = ?;
-        `;
-    const selectUserAccountRow = await connection.query(
-        selectUserAccountQuery,
-        email
-    );
-    return selectUserAccountRow[0];
+                SELECT idx, status
+                FROM Users
+                WHERE id = ?;
+                `;
+    const accountCheckRow = await connection.query(selectUserAccountQuery, userId);
+    return accountCheckRow[0];
 }
 
 // 사용자 정보 불러오기
@@ -265,15 +259,21 @@ async function selectUserLocationByLocationId(connection, userLocationId) {
 
 // 특정 사용자 프로필 사진 수정
 async function updateLocation(connection, userLocationId, newLocation, checkAuth, checkAuthCount){
-    const vari = [newLocation, checkAuth, checkAuthCount];
+    // const vari = [newLocation, checkAuth, checkAuthCount];
+    // const updateLocationQuery = `
+    //             UPDATE UserLocations SET
+    //             location = ?, auth = ?, auth_count = ?
+    //             WHERE UserLocations.id = ${userLocationId};
+    //             `;
+    // await connection.query(updateLocationQuery, vari);
+    
     const updateLocationQuery = `
                 UPDATE UserLocations SET
                 location = ?, auth = ?, auth_count = ?
-                WHERE UserLocations.id = ${userLocationId};
+                WHERE UserLocations.id = ?;
                 `;
-    await connection.query(updateLocationQuery, vari);
+    await connection.query(updateLocationQuery, userLocationId, newLocation, checkAuth, checkAuthCount);
 }
-
 
 module.exports = {
     selectUser,
@@ -284,6 +284,8 @@ module.exports = {
     selectUserStatus,
     selectUserIdCheck,
     selectUserNicknameCheck,
+    selectUserPassword,
+    selectUserAccount,
     selectUserPatch,
     selectUserImage,
     selectUserImageByImageId,

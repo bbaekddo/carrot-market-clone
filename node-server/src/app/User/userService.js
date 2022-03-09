@@ -25,10 +25,11 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
             return errResponse(baseResponse.SIGNUP_REDUNDANT_NICKNAME);
 
         // 비밀번호 암호화
-        // const hashedPassword = await crypto
-        //     .createHash("sha512")
-        //     .update(password)
-        //     .digest("hex");
+        const hashedPassword = await crypto
+            .createHash("sha512")
+            .update(pswd)
+            .digest("hex");
+        
         const connection1 = await pool.getConnection(async (conn) => conn);
         const connection2 = await pool.getConnection(async (conn) => conn);
         const connection3 = await pool.getConnection(async (conn) => conn);
@@ -41,7 +42,7 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
         // 사용자 프로필 사진 id 값 받기
         const userProfile_img = await userDao.insertUserImage(connection3);
         
-        const insertUserInfoParams = [id, pswd, name, nickname, userProfile_img, userLocation1, userLocation2];
+        const insertUserInfoParams = [id, hashedPassword, name, nickname, userProfile_img, userLocation1, userLocation2];
         const insertUserResult = await userDao.insertUserInfo(connection4, insertUserInfoParams);
         const insertUserInfo = await userDao.selectUserIndex(connection5, insertUserResult);
         
@@ -49,7 +50,7 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
         connection2.release();
         connection3.release();
         connection4.release();
-        connection4.release();
+        connection5.release();
         
         return response(baseResponse.SUCCESS, insertUserInfo);
         
@@ -61,76 +62,82 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
     }
 };
 
-
-
 // TODO: After 로그인 인증 방법 (JWT)
-// exports.postSignIn = async function (email, password) {
-//     try {
-//         // 이메일 여부 확인
-//         const emailRows = await userProvider.emailCheck(email);
-//         if (emailRows.length < 1) return errResponse(baseResponse.SIGNIN_EMAIL_WRONG);
-//
-//         const selectEmail = emailRows[0].email
-//
-//         // 비밀번호 확인
-//         const hashedPassword = await crypto
-//             .createHash("sha512")
-//             .update(password)
-//             .digest("hex");
-//
-//         const selectUserPasswordParams = [selectEmail, hashedPassword];
-//         const passwordRows = await userProvider.passwordCheck(selectUserPasswordParams);
-//
-//         if (passwordRows[0].password !== hashedPassword) {
-//             return errResponse(baseResponse.SIGNIN_PASSWORD_WRONG);
-//         }
-//
-//         // 계정 상태 확인
-//         const userInfoRows = await userProvider.accountCheck(email);
-//
-//         if (userInfoRows[0].status === "INACTIVE") {
-//             return errResponse(baseResponse.SIGNIN_INACTIVE_ACCOUNT);
-//         } else if (userInfoRows[0].status === "DELETED") {
-//             return errResponse(baseResponse.SIGNIN_WITHDRAWAL_ACCOUNT);
-//         }
-//
-//         console.log(userInfoRows[0].id) // DB의 userId
-//
-//         //토큰 생성 Service
-//         let token = await jwt.sign(
-//             {
-//                 userId: userInfoRows[0].id,
-//             }, // 토큰의 내용(payload)
-//             secret_config.jwtsecret, // 비밀키
-//             {
-//                 expiresIn: "365d",
-//                 subject: "userInfo",
-//             } // 유효 기간 365일
-//         );
-//
-//         return response(baseResponse.SUCCESS, {'userId': userInfoRows[0].id, 'jwt': token});
-//
-//     } catch (err) {
-//         logger.error(`App - postSignIn Service error\n: ${err.message} \n${JSON.stringify(err)}`);
-//         return errResponse(baseResponse.DB_ERROR);
-//     }
-// };
+exports.postSignIn = async function (id, password) {
+    try {
+        // ID 여부 확인
+        const idRows = await userProvider.userIdCheck(id);
+        if (idRows.length < 1) return errResponse(baseResponse.SIGNIN_ID_WRONG);
 
-exports.editUser = async function (idx, id, pswd, name, nickname) {
+        const selectID = idRows[0].id;
+    
+        // 비밀번호 확인
+        const hashedPassword = await crypto
+            .createHash("sha512")
+            .update(password)
+            .digest("hex");
+        
+        const selectUserPasswordParams = [selectID, hashedPassword];
+        const passwordRows = await userProvider.passwordCheck(selectUserPasswordParams);
+    
+        if (passwordRows[0].pswd !== hashedPassword) {
+            return errResponse(baseResponse.SIGNIN_PASSWORD_WRONG);
+        }
+
+        // 계정 상태 확인
+        const userInfoRows = await userProvider.accountCheck(id);
+
+        if (userInfoRows[0].status === "STOP") {
+            return errResponse(baseResponse.SIGNIN_INACTIVE_ACCOUNT);
+        } else if (userInfoRows[0].status === "DELETED") {
+            return errResponse(baseResponse.SIGNIN_WITHDRAWAL_ACCOUNT);
+        }
+
+        //토큰 생성 Service
+        let token = await jwt.sign(
+            {
+                userIdx: userInfoRows[0].idx,
+            }, // 토큰의 내용(payload)
+            secret_config.jwtsecret, // 비밀키
+            {
+                expiresIn: "365d",
+                subject: "userInfo",
+            } // 유효 기간 365일
+        );
+
+        return response(baseResponse.SUCCESS, {'userIdx': userInfoRows[0].idx, 'jwt': token});
+
+    } catch (err) {
+        logger.error(`App - postSignIn Service error\n: ${err.message} \n${JSON.stringify(err)}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+};
+
+exports.editUser = async function (idx, id, password, name, nickname) {
     try {
         const connection1 = await pool.getConnection(async (conn) => conn);
         const connection2 = await pool.getConnection(async (conn) => conn);
         const connection3 = await pool.getConnection(async (conn) => conn);
         const oldPatches = await userDao.selectUserPatch(connection1, idx);
-        const newPatches = [id, pswd, name, nickname];
-        await userDao.updateUser(connection2, idx, oldPatches, newPatches);
-        const editUserResult = await userDao.selectUserIndex(connection3, idx);
-        connection1.release();
-        connection2.release();
-        connection3.release();
-
-        return response(baseResponse.SUCCESS, editUserResult);
-
+        const newPatches = [id, password, name, nickname];
+        
+        try {
+            await connection2.beginTransaction();
+            await userDao.updateUser(connection2, idx, oldPatches, newPatches);
+            await connection2.commit();
+    
+            const editUserResult = await userDao.selectUserIndex(connection3, idx);
+    
+            return response(baseResponse.SUCCESS, editUserResult);
+        } catch (err) {
+            await connection2.rollback();
+            
+            return err;
+        } finally {
+            connection1.release();
+            connection2.release();
+            connection3.release();
+        }
     } catch (err) {
         logger.error(`App - editUser Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
