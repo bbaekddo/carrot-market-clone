@@ -43,17 +43,25 @@ exports.createUser = async function (id, pswd, name, nickname, location) {
         const userProfile_img = await userDao.insertUserImage(connection3);
         
         const insertUserInfoParams = [id, hashedPassword, name, nickname, userProfile_img, userLocation1, userLocation2];
-        const insertUserResult = await userDao.insertUserInfo(connection4, insertUserInfoParams);
-        const insertUserInfo = await userDao.selectUserIndex(connection5, insertUserResult);
-        
-        connection1.release();
-        connection2.release();
-        connection3.release();
-        connection4.release();
-        connection5.release();
-        
-        return response(baseResponse.SUCCESS, insertUserInfo);
-        
+        try {
+            await connection4.beginTransaction();
+            const insertUserResult = await userDao.insertUserInfo(connection4, insertUserInfoParams);
+            await connection4.commit();
+    
+            const selectUserInfo = await userDao.selectUserIndex(connection5, insertUserResult);
+    
+            return response(baseResponse.SUCCESS, selectUserInfo);
+        } catch (err) {
+            await connection4.rollback();
+            
+            return err;
+        } finally {
+            connection1.release();
+            connection2.release();
+            connection3.release();
+            connection4.release();
+            connection5.release();
+        }
     } catch (err) {
         logger.error(`App - createUser Service error\n: ${err.message}`);
         
@@ -148,13 +156,22 @@ exports.editUserImage = async function (userImageId, userImageData) {
     try {
         const connection1 = await pool.getConnection(async (conn) => conn);
         const connection2 = await pool.getConnection(async (conn) => conn);
-        await userDao.updateImage(connection1, userImageId, userImageData);
-        const editImageResult = await userDao.selectUserImageByImageId(connection2, userImageId);
-        connection1.release();
-        connection2.release();
-        
-        return response(baseResponse.SUCCESS, editImageResult);
-        
+        try {
+            await connection1.beginTransaction();
+            await userDao.updateImage(connection1, userImageId, userImageData);
+            await connection1.commit();
+    
+            const editImageResult = await userDao.selectUserImageByImageId(connection2, userImageId);
+    
+            return response(baseResponse.SUCCESS, editImageResult);
+        } catch (err) {
+            connection1.rollback();
+            
+            return err;
+        } finally {
+            connection1.release();
+            connection2.release();
+        }
     } catch (err) {
         logger.error(`App - editUserImage Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
@@ -165,13 +182,22 @@ exports.editUserLocation = async function (userLocationId, userLocation, userLoc
     try {
         const connection1 = await pool.getConnection(async (conn) => conn);
         const connection2 = await pool.getConnection(async (conn) => conn);
-        await userDao.updateLocation(connection1, userLocationId, userLocation, userLocationAuth, userLocationAuthCount);
-        const editLocationResult = await userDao.selectUserLocationByLocationId(connection2, userLocationId);
-        connection1.release();
-        connection2.release();
-        
-        return response(baseResponse.SUCCESS, editLocationResult);
-        
+        try {
+            await connection1.beginTransaction();
+            await userDao.updateLocation(connection1, userLocationId, userLocation, userLocationAuth, userLocationAuthCount);
+            await connection1.commit();
+    
+            const editLocationResult = await userDao.selectUserLocationByLocationId(connection2, userLocationId);
+    
+            return response(baseResponse.SUCCESS, editLocationResult);
+        } catch (err) {
+            connection1.rollback();
+            
+            return err;
+        } finally {
+            connection1.release();
+            connection2.release();
+        }
     } catch (err) {
         logger.error(`App - editUserLocation Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);

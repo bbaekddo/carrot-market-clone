@@ -1,3 +1,4 @@
+const user = require("./userController");
 module.exports = function(app){
     const user = require('./userController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
@@ -12,12 +13,9 @@ module.exports = function(app){
     app.get('/app/users/:userId', user.getUserById);
     
     // 4. 특정 닉네임으로 사용자 조회
-    app.get('/app/users/nicknames/:userNickname', user.getUserByNickname);
-   
-    // 5. 특정 사용자 수정/삭제
-    // app.patch('/app/users/:userIdx', user.patchUsers);
-   
-    // 6. 특정 사용자 프로필 사진 조회
+    // app.get('/app/users/nicknames/:userNickname', user.getUserByNickname);
+    
+    // 5. 특정 사용자 프로필 사진 조회
     app.get('/app/users/images/:imageId', user.getImages);
     
     // 7. 특정 사용자 프로필 사진 수정/삭제
@@ -34,7 +32,7 @@ module.exports = function(app){
     app.post('/app/login', user.login);
 
     // 11. 회원 정보 수정 API (JWT 검증 및 Validation - 메소드 체이닝 방식으로 jwtMiddleware 사용)
-    app.patch('/app/users/:userIdx', jwtMiddleware, user.patchUsers)
+    app.patch('/app/users/:userIdx', jwtMiddleware, user.patchUsers);
     
     // TODO: 자동로그인 API (JWT 검증 및 Payload 내뱉기)
     // JWT 검증 API
