@@ -1,4 +1,4 @@
-const user = require("./userController");
+const qs = require('querystring');
 module.exports = function(app){
     const user = require('./userController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
@@ -38,6 +38,49 @@ module.exports = function(app){
     // JWT 검증 API
     // app.get('/app/auto-login', jwtMiddleware, user.check);
     
+    app.get('/app/users/login/facebook', (req, res) => {
+        const stringfiedParams = qs.stringify({
+            client_id: "420065332493079",
+            redirect_url: "https://www.sosocamp.shop/app/users/auth/callback",
+            scope: ['email', 'user_friends'].join(','),
+            response_type: 'code',
+            auth_type: 'rerequest',
+            display: 'popup'
+        });
+        
+        const facebookUrl = `https://www.facebook.com/v12.0/dialog/oauth?${{stringfiedParams}}`;
+        res.type('text/html').status(200).send(`
+            <!DOCTYPE html>
+            <html>
+                <body>
+                <a href=${facebookUrl}>
+                    Login with Facebook
+                </a>
+                </body>
+            </html>
+        `);
+    });
+    
+    async function getAccessTokenFromCode(code) {
+        const {data} = await axios({
+            url: 'https://graph.facebook.com/v12.0/oauth/access_token',
+            method: 'get',
+            params: {
+                client_id: '420065332493079',
+                client_secret: 'a222b4bef624e1b918018e879cb1b1f6',
+                redirect_url: 'https://www.sosocamp.shop/app/users/auth/callback',
+                code,
+            },
+        });
+        console.log(data);
+        return data.access_token;
+    }
+    
+    app.get('/app/users/auth/callback', async(req, res) => {
+        const acceess_token = await getAccessTokenFromCode(req.query.code);
+        console.log(acceess_token);
+        res.send("authentification success!");
+    });
 };
 
 
