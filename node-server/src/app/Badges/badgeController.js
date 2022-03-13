@@ -3,12 +3,6 @@ const badgeService = require("../../app/Badges/badgeService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response, errResponse} = require("../../../config/response");
 
-// 특수문자 포함 여부 검증
-function containsSpecialChars(str) {
-    const specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-    return specialChars.test(str);
-}
-
 /**
  * API No. 1
  * API Name : 활동 배지 생성

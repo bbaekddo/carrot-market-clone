@@ -1,115 +1,67 @@
 const { pool } = require("../../../config/database");
 const {logger} = require("../../../config/winston");
-
 const userDao = require("./userDao");
+const {errResponse} = require("../../../config/response");
+const baseResponse = require("../../../config/baseResponseStatus");
 
 // Provider: Read 비즈니스 로직 처리
 
-exports.retrieveUserList = async function () {
+exports.getUserList = async function () {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userListResult = await userDao.selectUser(connection);
+    const userListResult = await userDao.selectAllUser(connection);
     connection.release();
     
     return userListResult;
 };
 
-exports.retrieveUserById = async function (userId) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  const userIdResult = await userDao.selectUserId(connection, userId);
-  connection.release();
-
-  return userIdResult;
+exports.getUserByIdx = async function (userIdx) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const userIdxResult = await userDao.selectUserByIdx(connection, userIdx);
+    connection.release();
+    
+    return userIdxResult;
 };
 
-// 사용 안함
-exports.retrieveUserByNickname = async function (userNickname) {
+exports.getUserById = async function (userId) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userNicknameResult = await userDao.selectUserNickname(connection, userNickname);
+    const userIdResult = await userDao.selectUserById(connection, userId);
+    connection.release();
+    
+    return userIdResult;
+};
+
+exports.getUserByNickname = async function (userNickname) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const userNicknameResult = await userDao.selectUserByNickname(connection, userNickname);
     connection.release();
     
     return userNicknameResult;
 };
 
-exports.retrieveUserListByName = async function (userName) {
+exports.getImageByUserIdx = async function (userIdx) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userListByNameResult = await userDao.selectUserName(connection, userName);
+    
+    // 사용자 Idx 확인
+    const userRows = await userDao.selectUserByIdx(connection, userIdx);
+    if (userRows.length < 1) {
+        return errResponse(baseResponse.USER_USERIDX_NOT_MATCH);
+    }
+    
+    // 프로필 사진 데이터 불러오기
+    const imageId = userRows[0].profileImg;
+    const imageResult = await userDao.selectImageByImageId(connection, imageId);
     connection.release();
     
-    return userListByNameResult;
+    return imageResult;
 };
 
-
-exports.retrieveUserListByStatus = async function (userStatus) {
+exports.getPassword = async function (userId) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userListByStatusResult = await userDao.selectUserStatus(connection, userStatus);
-    connection.release();
-    
-    return userListByStatusResult;
-};
-
-exports.userIdCheck = async function (userId) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  const userIdCheckResult = await userDao.selectUserIdCheck(connection, userId);
-  connection.release();
-
-  return userIdCheckResult;
-};
-
-exports.userNicknameCheck = async function (userNickname) {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userNicknameCheckResult = await userDao.selectUserNicknameCheck(connection, userNickname);
-    connection.release();
-    
-    return userNicknameCheckResult;
-};
-
-exports.retrieveUserImageList = async function () {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userImageListResult = await userDao.selectUserImage(connection);
-    connection.release();
-    
-    return userImageListResult;
-};
-
-exports.retrieveUserImageListByImageId = async function (userImageId) {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userImageListByImageId = await userDao.selectUserImageByImageId(connection, userImageId);
-    connection.release();
-    
-    return userImageListByImageId;
-};
-
-exports.retrieveUserLocationList = async function () {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userLocationListResult = await userDao.selectUserLocation(connection);
-    connection.release();
-    
-    return userLocationListResult;
-};
-
-exports.retrieveUserLocationListByLocationId = async function (userLocationId) {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userLocationListByLocationId = await userDao.selectUserLocationByLocationId(connection, userLocationId);
-    connection.release();
-    
-    return userLocationListByLocationId;
-};
-
-exports.passwordCheck = async function (selectUserPasswordParams) {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const passwordCheckResult = await userDao.selectUserPassword(
+    const passwordResult = await userDao.selectPasswordById(
         connection,
-        selectUserPasswordParams
+        userId
     );
     connection.release();
     
-    return passwordCheckResult;
-};
-
-exports.accountCheck = async function (userId) {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userAccountResult = await userDao.selectUserAccount(connection, userId);
-    connection.release();
-    
-    return userAccountResult;
+    return passwordResult;
 };

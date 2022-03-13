@@ -3,14 +3,14 @@
 -- Locations Table Create SQL
 CREATE TABLE Locations
 (
-    `id`           BIGINT            NOT NULL    AUTO_INCREMENT COMMENT 'Location ID', 
-    `address`      TEXT              NOT NULL    COMMENT 'Location Address', 
-    `name`         VARCHAR(10)       NULL        COMMENT '''~~동'' 까지 표시', 
-    `latitude`     DECIMAL(10, 7)    NOT NULL    COMMENT 'Latitude Degree', 
-    `longtitude`   DECIMAL(10, 7)    NOT NULL    COMMENT 'Longtitude Degree', 
-    `create_date`  TIMESTAMP         NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP         NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)       NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT            NOT NULL    AUTO_INCREMENT COMMENT 'Location ID', 
+    `address`     TEXT              NOT NULL    COMMENT 'Location Address', 
+    `name`        VARCHAR(10)       NULL        COMMENT '''~~동'' 까지 표시', 
+    `latitude`    DECIMAL(10, 7)    NOT NULL    COMMENT 'Latitude Degree', 
+    `longtitude`  DECIMAL(10, 7)    NOT NULL    COMMENT 'Longtitude Degree', 
+    `createDate`  TIMESTAMP         NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP         NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)       NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -20,11 +20,11 @@ ALTER TABLE Locations COMMENT 'API 위치 정보';
 -- CategoryImages Table Create SQL
 CREATE TABLE CategoryImages
 (
-    `id`           SMALLINT       NOT NULL    AUTO_INCREMENT COMMENT 'Category Image ID', 
-    `data`         TEXT           NULL        DEFAULT NULL COMMENT 'Category Image URL', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          SMALLINT       NOT NULL    AUTO_INCREMENT COMMENT 'Category Image ID', 
+    `data`        TEXT           NULL        DEFAULT NULL COMMENT 'Category Image URL', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -34,13 +34,13 @@ ALTER TABLE CategoryImages COMMENT '상품 카테고리 일러스트 사진';
 -- UserLocations Table Create SQL
 CREATE TABLE UserLocations
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'User Location ID', 
-    `location`     BIGINT         NOT NULL    COMMENT 'Location ID', 
-    `auth`         CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : 미인증 / Y: 인증 완료', 
-    `auth_count`   INT            NOT NULL    DEFAULT 0 COMMENT 'Authentication Count', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'User Location ID', 
+    `location`    BIGINT         NOT NULL    COMMENT 'Location ID', 
+    `auth`        CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : 미인증 / Y: 인증 완료', 
+    `authCount`   INT            NOT NULL    DEFAULT 0 COMMENT 'Authentication Count', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -54,11 +54,11 @@ ALTER TABLE UserLocations
 -- ProfileImages Table Create SQL
 CREATE TABLE ProfileImages
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Profile Image ID', 
-    `data`         TEXT           NULL        DEFAULT NULL COMMENT 'Profile Image URL', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Profile Image ID', 
+    `data`        TEXT           NULL        DEFAULT NULL COMMENT 'Profile Image URL', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -68,20 +68,20 @@ ALTER TABLE ProfileImages COMMENT '사용자 프로필 사진';
 -- Users Table Create SQL
 CREATE TABLE Users
 (
-    `idx`                 BIGINT           NOT NULL    AUTO_INCREMENT COMMENT 'User Index', 
-    `id`                  VARCHAR(20)      NOT NULL    COMMENT 'User ID', 
-    `pswd`                TEXT             NOT NULL    COMMENT 'User Password', 
-    `name`                VARCHAR(10)      NOT NULL    COMMENT 'User Name', 
-    `nickname`            VARCHAR(20)      NOT NULL    COMMENT 'User Nickname', 
-    `profile_img`         BIGINT           NOT NULL    COMMENT 'Profile Image ID', 
-    `manner_temperature`  DECIMAL(3, 1)    NOT NULL    DEFAULT 36.5 COMMENT '0 ~ 99.9 Range', 
-    `retrade_rate`        TINYINT          NULL        DEFAULT NULL COMMENT 'Retrade Rate', 
-    `reply_rate`          TINYINT          NULL        DEFAULT NULL COMMENT 'Reply Rate', 
-    `location1`           BIGINT           NOT NULL    COMMENT 'User Location 1', 
-    `location2`           BIGINT           NOT NULL    COMMENT 'User Location 2', 
-    `create_date`         TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`         TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`              VARCHAR(10)      NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `idx`                BIGINT           NOT NULL    AUTO_INCREMENT COMMENT 'User Index', 
+    `id`                 VARCHAR(20)      NOT NULL    COMMENT 'User ID', 
+    `password`           TEXT             NOT NULL    COMMENT 'User Password', 
+    `name`               VARCHAR(10)      NOT NULL    COMMENT 'User Name', 
+    `nickname`           VARCHAR(20)      NOT NULL    COMMENT 'User Nickname', 
+    `profileImg`         BIGINT           NOT NULL    COMMENT 'Profile Image ID', 
+    `mannerTemperature`  DECIMAL(3, 1)    NOT NULL    DEFAULT 36.5 COMMENT '0 ~ 99.9 Range', 
+    `retradeRate`        TINYINT          NULL        DEFAULT NULL COMMENT 'Retrade Rate', 
+    `replyRate`          TINYINT          NULL        DEFAULT NULL COMMENT 'Reply Rate', 
+    `location1`          BIGINT           NOT NULL    COMMENT 'User Location 1', 
+    `location2`          BIGINT           NOT NULL    COMMENT 'User Location 2', 
+    `createDate`         TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`         TIMESTAMP        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`             VARCHAR(10)      NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (idx)
 );
 
@@ -91,7 +91,7 @@ CREATE UNIQUE INDEX UQ_Users_1
     ON Users(id, nickname);
 
 ALTER TABLE Users
-    ADD CONSTRAINT FK_Users_profile_img_ProfileImages_id FOREIGN KEY (profile_img)
+    ADD CONSTRAINT FK_Users_profileImg_ProfileImages_id FOREIGN KEY (profileImg)
         REFERENCES ProfileImages (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE Users
@@ -106,11 +106,11 @@ ALTER TABLE Users
 -- Expressions Table Create SQL
 CREATE TABLE Expressions
 (
-    `id`           TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'Relate to Post ID', 
-    `content`      VARCHAR(2)     NOT NULL    COMMENT 'Expression Data', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'Relate to Post ID', 
+    `content`     VARCHAR(2)     NOT NULL    COMMENT 'Expression Data', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -123,11 +123,11 @@ CREATE UNIQUE INDEX UQ_Expressions_1
 -- Topics Table Create SQL
 CREATE TABLE Topics
 (
-    `id`           TINYINT         NOT NULL    AUTO_INCREMENT COMMENT 'Post Topic ID', 
-    `name`         VARCHAR(100)    NOT NULL    COMMENT 'Topic Name', 
-    `create_date`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)     NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          TINYINT         NOT NULL    AUTO_INCREMENT COMMENT 'Post Topic ID', 
+    `name`        VARCHAR(100)    NOT NULL    COMMENT 'Topic Name', 
+    `createDate`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)     NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -140,11 +140,11 @@ CREATE UNIQUE INDEX UQ_Topics_1
 -- BadgeImages Table Create SQL
 CREATE TABLE BadgeImages
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Badge Image ID', 
-    `data`         TEXT           NULL        COMMENT 'Badge Image URL', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Badge Image ID', 
+    `data`        TEXT           NULL        COMMENT 'Badge Image URL', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -154,12 +154,12 @@ ALTER TABLE BadgeImages COMMENT '배지 일러스트 사진';
 -- Categoires Table Create SQL
 CREATE TABLE Categoires
 (
-    `id`           TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'Item Category ID', 
-    `name`         VARCHAR(20)    NOT NULL    COMMENT 'Category Name', 
-    `image`        SMALLINT       NOT NULL    COMMENT 'Category Image ID', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'Item Category ID', 
+    `name`        VARCHAR(20)    NOT NULL    COMMENT 'Category Name', 
+    `image`       SMALLINT       NOT NULL    COMMENT 'Category Image ID', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -176,11 +176,11 @@ ALTER TABLE Categoires
 -- UserMannerTypes Table Create SQL
 CREATE TABLE UserMannerTypes
 (
-    `id`           SMALLINT       NOT NULL    AUTO_INCREMENT COMMENT 'Manner Type ID', 
-    `content`      VARCHAR(30)    NOT NULL    COMMENT 'Manner Type Content', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          SMALLINT       NOT NULL    AUTO_INCREMENT COMMENT 'Manner Type ID', 
+    `content`     VARCHAR(30)    NOT NULL    COMMENT 'Manner Type Content', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -193,17 +193,17 @@ CREATE UNIQUE INDEX UQ_UserMannerTypes_1
 -- Items Table Create SQL
 CREATE TABLE Items
 (
-    `id`            BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Item ID', 
-    `name`          VARCHAR(50)    NOT NULL    COMMENT 'Item Name', 
-    `category`      TINYINT        NOT NULL    COMMENT 'Item Category', 
-    `content`       TEXT           NOT NULL    COMMENT 'Item Description', 
-    `price`         INT            NOT NULL    COMMENT 'KRW', 
-    `location`      BIGINT         NOT NULL    COMMENT 'Sale Location', 
-    `lookup_count`  SMALLINT       NOT NULL    DEFAULT 0 COMMENT 'Lookup Count', 
-    `proposal`      CHAR(1)        NOT NULL    DEFAULT 'Y' COMMENT 'Y : 제안 가능 / N: 제안 불가', 
-    `create_date`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`        VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Item ID', 
+    `name`         VARCHAR(50)    NOT NULL    COMMENT 'Item Name', 
+    `category`     TINYINT        NOT NULL    COMMENT 'Item Category', 
+    `content`      TEXT           NOT NULL    COMMENT 'Item Description', 
+    `price`        INT            NOT NULL    COMMENT 'KRW', 
+    `location`     BIGINT         NOT NULL    COMMENT 'Sale Location', 
+    `lookupCount`  SMALLINT       NOT NULL    DEFAULT 0 COMMENT 'Lookup Count', 
+    `proposal`     CHAR(1)        NOT NULL    DEFAULT 'Y' COMMENT 'Y : 제안 가능 / N: 제안 불가', 
+    `createDate`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -221,13 +221,13 @@ ALTER TABLE Items
 -- BadgeTypes Table Create SQL
 CREATE TABLE BadgeTypes
 (
-    `id`           INT            NOT NULL    AUTO_INCREMENT COMMENT 'Badge Type ID', 
-    `name`         VARCHAR(10)    NOT NULL    COMMENT 'Badge Name', 
-    `content`      VARCHAR(50)    NOT NULL    COMMENT 'Badge Description', 
-    `image`        BIGINT         NOT NULL    COMMENT 'Bade Image ID', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          INT            NOT NULL    AUTO_INCREMENT COMMENT 'Badge Type ID', 
+    `name`        VARCHAR(10)    NOT NULL    COMMENT 'Badge Name', 
+    `content`     VARCHAR(50)    NOT NULL    COMMENT 'Badge Description', 
+    `image`       BIGINT         NOT NULL    COMMENT 'Bade Image ID', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -244,15 +244,15 @@ ALTER TABLE BadgeTypes
 -- Neighborhoods Table Create SQL
 CREATE TABLE Neighborhoods
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Neighborhood Post ID', 
-    `user`         BIGINT         NOT NULL    COMMENT 'Created User Index', 
-    `location`     BIGINT         NOT NULL    COMMENT 'Location ID', 
-    `content`      TEXT           NOT NULL    COMMENT 'Post Content', 
-    `topic`        TINYINT        NOT NULL    COMMENT 'Post Topic ID', 
-    `expression`   TINYINT        NOT NULL    COMMENT 'Relate to Post ID', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Neighborhood Post ID', 
+    `user`        BIGINT         NOT NULL    COMMENT 'Created User Index', 
+    `location`    BIGINT         NOT NULL    COMMENT 'Location ID', 
+    `content`     TEXT           NOT NULL    COMMENT 'Post Content', 
+    `topic`       TINYINT        NOT NULL    COMMENT 'Post Topic ID', 
+    `expression`  TINYINT        NOT NULL    COMMENT 'Relate to Post ID', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -278,14 +278,14 @@ ALTER TABLE Neighborhoods
 -- Keywords Table Create SQL
 CREATE TABLE Keywords
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Keyword ID', 
-    `user`         BIGINT         NOT NULL    COMMENT 'User ID', 
-    `word`         VARCHAR(30)    NOT NULL    COMMENT 'Keywords', 
-    `item`         BIGINT         NOT NULL    COMMENT 'Item ID', 
-    `catch`        CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : Fail / Y : Success', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Keyword ID', 
+    `user`        BIGINT         NOT NULL    COMMENT 'User ID', 
+    `word`        VARCHAR(30)    NOT NULL    COMMENT 'Keywords', 
+    `item`        BIGINT         NOT NULL    COMMENT 'Item ID', 
+    `catch`       CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : Fail / Y : Success', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -303,12 +303,12 @@ ALTER TABLE Keywords
 -- Notices Table Create SQL
 CREATE TABLE Notices
 (
-    `id`           BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'Notice ID', 
-    `title`        VARCHAR(100)    NOT NULL    COMMENT 'Notice Title', 
-    `content`      TEXT            NOT NULL    COMMENT 'Notice Content', 
-    `create_date`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)     NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'Notice ID', 
+    `title`       VARCHAR(100)    NOT NULL    COMMENT 'Notice Title', 
+    `content`     TEXT            NOT NULL    COMMENT 'Notice Content', 
+    `createDate`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)     NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -318,13 +318,13 @@ ALTER TABLE Notices COMMENT '공지사항';
 -- UserManners Table Create SQL
 CREATE TABLE UserManners
 (
-    `id`            BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Manner Review ID', 
-    `receive_user`  BIGINT         NOT NULL    COMMENT 'Manner Received User', 
-    `send_user`     BIGINT         NOT NULL    COMMENT 'Manner Sent User', 
-    `manner`        SMALLINT       NOT NULL    COMMENT 'Manner Type ID', 
-    `create_date`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`        VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Manner Review ID', 
+    `receiveUser`  BIGINT         NOT NULL    COMMENT 'Manner Received User', 
+    `sendUser`     BIGINT         NOT NULL    COMMENT 'Manner Sent User', 
+    `manner`       SMALLINT       NOT NULL    COMMENT 'Manner Type ID', 
+    `createDate`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`   TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -335,48 +335,48 @@ ALTER TABLE UserManners
         REFERENCES UserMannerTypes (id) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE UserManners
-    ADD CONSTRAINT FK_UserManners_receive_user_Users_idx FOREIGN KEY (receive_user)
+    ADD CONSTRAINT FK_UserManners_receiveUser_Users_idx FOREIGN KEY (receiveUser)
         REFERENCES Users (idx) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE UserManners
-    ADD CONSTRAINT FK_UserManners_send_user_Users_idx FOREIGN KEY (send_user)
+    ADD CONSTRAINT FK_UserManners_sendUser_Users_idx FOREIGN KEY (sendUser)
         REFERENCES Users (idx) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 
 -- UserReviews Table Create SQL
 CREATE TABLE UserReviews
 (
-    `id`            BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'Review ID', 
-    `receive_user`  BIGINT          NOT NULL    COMMENT 'Review Received User', 
-    `send_user`     BIGINT          NOT NULL    COMMENT 'Review Sent User', 
-    `content`       VARCHAR(100)    NOT NULL    COMMENT 'Review Content', 
-    `create_date`   TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`   TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`        VARCHAR(10)     NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`           BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'Review ID', 
+    `receiveUser`  BIGINT          NOT NULL    COMMENT 'Review Received User', 
+    `sendUser`     BIGINT          NOT NULL    COMMENT 'Review Sent User', 
+    `content`      VARCHAR(100)    NOT NULL    COMMENT 'Review Content', 
+    `createDate`   TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`   TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`       VARCHAR(10)     NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
 ALTER TABLE UserReviews COMMENT '사용자 거래 후기';
 
 ALTER TABLE UserReviews
-    ADD CONSTRAINT FK_UserReviews_receive_user_Users_idx FOREIGN KEY (receive_user)
+    ADD CONSTRAINT FK_UserReviews_receiveUser_Users_idx FOREIGN KEY (receiveUser)
         REFERENCES Users (idx) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE UserReviews
-    ADD CONSTRAINT FK_UserReviews_send_user_Users_idx FOREIGN KEY (send_user)
+    ADD CONSTRAINT FK_UserReviews_sendUser_Users_idx FOREIGN KEY (sendUser)
         REFERENCES Users (idx) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 
 -- ItemPosts Table Create SQL
 CREATE TABLE ItemPosts
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Item Post ID', 
-    `item`         BIGINT         NOT NULL    COMMENT 'Item ID', 
-    `seller`       BIGINT         NOT NULL    COMMENT 'Seller User ID', 
-    `buyer`        BIGINT         NOT NULL    COMMENT 'Buyer User ID', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run : still on sale or want to buy  / Stop : complete or cancel / Deleted : hide or delete', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Item Post ID', 
+    `item`        BIGINT         NOT NULL    COMMENT 'Item ID', 
+    `seller`      BIGINT         NOT NULL    COMMENT 'Seller User ID', 
+    `buyer`       BIGINT         NOT NULL    COMMENT 'Buyer User ID', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN : still on sale or want to buy  / STOP : complete or cancel / DELETED : hide or delete', 
      PRIMARY KEY (id)
 );
 
@@ -398,12 +398,12 @@ ALTER TABLE ItemPosts
 -- Watchlists Table Create SQL
 CREATE TABLE Watchlists
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Watchlist ID', 
-    `item`         BIGINT         NOT NULL    COMMENT 'Watchlist Item ID', 
-    `buyer`        BIGINT         NOT NULL    COMMENT 'Buyer User ID', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Watchlist ID', 
+    `item`        BIGINT         NOT NULL    COMMENT 'Watchlist Item ID', 
+    `buyer`       BIGINT         NOT NULL    COMMENT 'Buyer User ID', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -421,13 +421,13 @@ ALTER TABLE Watchlists
 -- ItemImages Table Create SQL
 CREATE TABLE ItemImages
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Item Image ID', 
-    `item`         BIGINT         NOT NULL    COMMENT 'Item ID', 
-    `data`         TEXT           NULL        DEFAULT NULL COMMENT 'Item Image URL', 
-    `title_image`  CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : 일반 사진 / Y : 대표 사진', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Item Image ID', 
+    `item`        BIGINT         NOT NULL    COMMENT 'Item ID', 
+    `data`        TEXT           NULL        DEFAULT NULL COMMENT 'Item Image URL', 
+    `titleImage`  CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : 일반 사진 / Y : 대표 사진', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -441,14 +441,14 @@ ALTER TABLE ItemImages
 -- Comments Table Create SQL
 CREATE TABLE Comments
 (
-    `id`             BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Comment ID', 
-    `post`           BIGINT         NOT NULL    COMMENT 'Neighborhood Post ID', 
-    `user`           BIGINT         NOT NULL    COMMENT 'Created User Index', 
-    `content`        TEXT           NOT NULL    COMMENT 'Comment Content', 
-    `thumbup_count`  SMALLINT       NOT NULL    DEFAULT 0 COMMENT 'Thumb up Count', 
-    `create_date`    TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`    TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`         VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`            BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Comment ID', 
+    `post`          BIGINT         NOT NULL    COMMENT 'Neighborhood Post ID', 
+    `user`          BIGINT         NOT NULL    COMMENT 'Created User Index', 
+    `content`       TEXT           NOT NULL    COMMENT 'Comment Content', 
+    `thumbupCount`  SMALLINT       NOT NULL    DEFAULT 0 COMMENT 'Thumb up Count', 
+    `createDate`    TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`    TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`        VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -466,12 +466,12 @@ ALTER TABLE Comments
 -- NeighborhoodImages Table Create SQL
 CREATE TABLE NeighborhoodImages
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Post Image ID', 
-    `post`         BIGINT         NOT NULL    COMMENT 'Neighborhood Post ID', 
-    `data`         TEXT           NULL        DEFAULT NULL COMMENT 'Post Image URL', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'Post Image ID', 
+    `post`        BIGINT         NOT NULL    COMMENT 'Neighborhood Post ID', 
+    `data`        TEXT           NULL        DEFAULT NULL COMMENT 'Post Image URL', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 
@@ -485,13 +485,13 @@ ALTER TABLE NeighborhoodImages
 -- Badges Table Create SQL
 CREATE TABLE Badges
 (
-    `id`           BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'User Badge', 
-    `user`         BIGINT         NOT NULL    COMMENT 'User Index', 
-    `type`         INT            NOT NULL    COMMENT 'Badge Type', 
-    `check_gold`   CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : 일반 배지 / Y : 황금 배지', 
-    `create_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
-    `update_date`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
-    `status`       VARCHAR(10)    NOT NULL    DEFAULT 'Run' COMMENT 'Run(Normal) / Stop / Deleted', 
+    `id`          BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'User Badge', 
+    `user`        BIGINT         NOT NULL    COMMENT 'User Index', 
+    `type`        INT            NOT NULL    COMMENT 'Badge Type', 
+    `checkGold`   CHAR(1)        NOT NULL    DEFAULT 'N' COMMENT 'N : 일반 배지 / Y : 황금 배지', 
+    `createDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT 'Created Date', 
+    `updateDate`  TIMESTAMP      NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated Date', 
+    `status`      VARCHAR(10)    NOT NULL    DEFAULT 'RUN' COMMENT 'RUN(Normal) / STOP / DELETED', 
      PRIMARY KEY (id)
 );
 

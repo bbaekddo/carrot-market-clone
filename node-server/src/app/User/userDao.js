@@ -1,105 +1,74 @@
+/////////// SELECT ///////////
 // 모든 사용자 조회
-async function selectUser(connection) {
-  const selectUserListQuery = `
-                SELECT idx, id, name, nickname, profile_img,
-                manner_temperature, retrade_rate, reply_rate,
+const {query} = require("winston");
+
+async function selectAllUser(connection) {
+  const selectAllUserQuery = `
+                SELECT idx, id, name, nickname, profileImg,
+                mannerTemperature, retradeRate, replyRate,
                 location1, location2, status
                 FROM Users;
                 `;
-  const [userRows] = await connection.query(selectUserListQuery);
+  const [userRows] = await connection.query(selectAllUserQuery);
   return userRows;
 }
 
-// 인덱스로 사용자 조회
-async function selectUserIndex(connection, idx) {
-  const selectUserIdxQuery = `
-                SELECT id, name, nickname, profile_img,
-                manner_temperature, retrade_rate, reply_rate,
-                location1, location2, status
+// Index로 사용자 조회
+async function selectUserByIdx(connection, userIdx) {
+  const selectUserByIdxQuery = `
+                SELECT id, name, nickname, profileImg, status
                 FROM Users
                 WHERE Users.idx = ?;
                 `;
-  const [userIdxRows] = await connection.query(selectUserIdxQuery, idx);
+  const [userIdxRows] = await connection.query(selectUserByIdxQuery, userIdx);
   return userIdxRows;
 }
 
 // ID로 사용자 조회
-async function selectUserId(connection, userId) {
-  const selectUserIdQuery = `
-                SELECT idx, name, nickname, profile_img,
-                manner_temperature, retrade_rate, reply_rate,
-                location1, location2, status
+async function selectUserById(connection, userId) {
+  const selectUserByIdQuery = `
+                SELECT idx, nickname, status
                 FROM Users
                 WHERE Users.id = ?;
                  `;
-  const [userIdRow] = await connection.query(selectUserIdQuery, userId);
+  const [userIdRow] = await connection.query(selectUserByIdQuery, userId);
   return userIdRow;
 }
 
-
 // 닉네임으로 사용자 조회
-// 사용안함
-async function selectUserNickname(connection, userNickname) {
-    const selectUserNicknameQuery = `
-                SELECT idx, id, name, profile_img,
-                manner_temperature, retrade_rate, reply_rate,
-                location1, location2, status
+async function selectUserByNickname(connection, userNickname) {
+    const selectUserByNicknameQuery = `
+                SELECT idx, status
                 FROM Users
                 WHERE Users.nickname = ?;
                  `;
-    const [userNicknameRow] = await connection.query(selectUserNicknameQuery, userNickname);
+    const [userNicknameRow] = await connection.query(selectUserByNicknameQuery, userNickname);
     return userNicknameRow;
 }
 
-
-// 이름으로 사용자 조회
-async function selectUserName(connection, userName) {
-    const selectUserNameQuery = `
-                SELECT idx, id, nickname, profile_img,
-                manner_temperature, retrade_rate, reply_rate,
-                location1, location2, status
-                FROM Users
-                WHERE Users.name = ?;
-                 `;
-    const [userNameRow] = await connection.query(selectUserNameQuery, userName);
-    return userNameRow;
-}
-
-// 계정 상태로 사용자 조회
-async function selectUserStatus(connection, userStatus) {
-    const selectUserStatusQuery = `
-                SELECT idx, id, name, nickname, profile_img,
-                manner_temperature, retrade_rate, reply_rate,
-                location1, location2
-                FROM Users
-                WHERE Users.status = ?;
-                 `;
-    const [userStatusRow] = await connection.query(selectUserStatusQuery, userStatus);
-    return userStatusRow;
-}
-
-async function selectUserIdCheck(connection, userId) {
-    const selectUserIdCheckQuery = `
-                SELECT idx, id, name, nickname
-                FROM Users
-                WHERE Users.id = ?
-                AND Users.status != ?
+// 특정 사용자 프로필 사진 정보 불러오기
+async function selectImageByImageId(connection, imageId) {
+    const imageByImageIdQuery = `
+                SELECT data
+                FROM ProfileImages
+                WHERE ProfileImages.id = ?;
                 `;
-    const idCheckRow = await connection.query(selectUserIdCheckQuery, [userId, 'DELETED']);
-    return idCheckRow[0];
+    const [userImageByImageIdRows] = await connection.query(imageByImageIdQuery, imageId);
+    return userImageByImageIdRows;
 }
 
-async function selectUserNicknameCheck(connection, userNickname) {
-    const selectUserNicknameCheckQuery = `
-                SELECT idx, id, name, nickname
+// 사용자 패스워드 체크
+async function selectPasswordById(connection, userId) {
+    const selectPasswordQuery = `
+                SELECT password
                 FROM Users
-                WHERE Users.nickname = ?
-                AND Users.status != ?
+                WHERE id = ?;
                 `;
-    const nickNameCheckRow = await connection.query(selectUserNicknameCheckQuery, [userNickname, 'DELETED']);
-    return nickNameCheckRow[0];
+    const [passwordRows] = await connection.query(selectPasswordQuery, userId);
+    return passwordRows[0].password;
 }
 
+/////////// INSERT ///////////
 // 사용자 위치 생성
 async function insertUserLocation(connection, userLocation) {
     const insertUserLocationQuery = `
@@ -121,180 +90,58 @@ async function insertUserImage(connection) {
 }
 
 // 사용자 생성
-async function insertUserInfo(connection, insertUserInfoParams) {
-    const insertUserInfoQuery = `
-                INSERT INTO Users(id, pswd, name, nickname, profile_img, location1, location2)
+async function insertUser(connection, userParams) {
+    const insertUserQuery = `
+                INSERT INTO Users(id, password, name, nickname, profileImg, location1, location2)
                 VALUES (?, ?, ?, ?, ?, ?, ?);
                 `;
-    const userInfo = await connection.query(insertUserInfoQuery, insertUserInfoParams);
-    return userInfo[0].insertId;
+    await connection.query(insertUserQuery, userParams);
 }
 
-// 사용자 패스워드 체크
-async function selectUserPassword(connection, selectUserPasswordParams) {
-    const selectUserPasswordQuery = `
-                SELECT idx, id, pswd, nickname
-                FROM Users
-                WHERE id = ? AND pswd = ?;
-                `;
-    const passwordCheckRow = await connection.query(selectUserPasswordQuery, selectUserPasswordParams);
-    return passwordCheckRow[0];
-}
-
-// 유저 계정 상태 체크 (jwt 생성 위해 id 값도 가져온다.)
-async function selectUserAccount(connection, userId) {
-    const selectUserAccountQuery = `
-                SELECT idx, status
-                FROM Users
-                WHERE id = ?;
-                `;
-    const accountCheckRow = await connection.query(selectUserAccountQuery, userId);
-    return accountCheckRow[0];
-}
-
-// 사용자 정보 불러오기
-async function selectUserPatch(connection, idx){
-    const selectUserPatchQuery = `
-        SELECT id, pswd, name, nickname
-        FROM Users
-        WHERE Users.idx = ?;
-        `;
-    const [selectUserPatchRow] = await connection.query(selectUserPatchQuery, idx);
-    const id = selectUserPatchRow[0].id;
-    const pswd = selectUserPatchRow[0].pswd;
-    const name = selectUserPatchRow[0].name;
-    const nickname = selectUserPatchRow[0].nickname;
-    
-    return [id, pswd, name, nickname];
-}
-
+/////////// UPDATE & DELETE ///////////
 // 사용자 정보 수정
-async function updateUser(connection, idx, oldPatches, newPatches) {
-    let id, pswd, name, nickname;
-    
-    if (newPatches[0] != null) {
-        id = newPatches[0];
-    } else{
-        id = oldPatches[0];
-    }
-    
-    if (newPatches[1] != null) {
-        pswd = newPatches[1];
-    } else{
-        pswd = oldPatches[1];
-    }
-    
-    if (newPatches[2] != null) {
-        name = newPatches[2];
-    } else{
-        name = oldPatches[2];
-    }
-    
-    if (newPatches[3] != null) {
-        nickname = newPatches[3];
-    } else{
-        nickname = oldPatches[3];
-    }
-    const updatePatches = [id, pswd, name, nickname];
+async function updateUser(connection, userParams) {
     const updateUserQuery = `
-        UPDATE Users SET
-        id = ?, pswd = ?, name = ?, nickname = ?
-        WHERE Users.idx = ${idx};
-        `;
-    
-    await connection.query(updateUserQuery, updatePatches);
-}
-
-// 전체 사용자 프로필 사진 정보 불러오기
-async function selectUserImage(connection) {
-    const selectUserImageListQuery = `
-                SELECT id, data, status
-                FROM ProfileImages;
+                UPDATE Users SET
+                password = ?, nickname = ?
+                WHERE Users.idx = ?;
                 `;
-    const [userImageRows] = await connection.query(selectUserImageListQuery);
-    return userImageRows;
+    await connection.query(updateUserQuery, userParams);
 }
 
-// 특정 사용자 프로필 사진 정보 불러오기
-async function selectUserImageByImageId(connection, userImageId) {
-    const selectUserImageByImageIdQuery = `
-                SELECT data, status
-                FROM ProfileImages
-                WHERE ProfileImages.id = ?;
+// 사용자 정보 삭제
+async function deleteUser(connection, userIdx) {
+    const deleteUserQuery = `
+                UPDATE Users SET
+                status = ?
+                WHERE Users.idx = ?;
                 `;
-    const [userImageByImageIdRows] = await connection.query(selectUserImageByImageIdQuery, userImageId);
-    return userImageByImageIdRows;
+    const queryParams = ["DELETED", userIdx];
+    await connection.query(deleteUserQuery, queryParams);
 }
 
-// 특정 사용자 프로필 사진 수정
-async function updateImage(connection, userImageId, newData){
+// 특정 사용자 프로필 사진 수정/삭제
+async function updateImage(connection, imageId, data){
     const updateImageQuery = `
                 UPDATE ProfileImages SET
                 data = ?
-                WHERE ProfileImages.id = ${userImageId};
+                WHERE ProfileImages.id = ?;
                 `;
-    await connection.query(updateImageQuery, newData);
-}
-
-// 전체 사용자 위치 정보 불러오기
-async function selectUserLocation(connection) {
-    const selectUserLocationListQuery = `
-                SELECT id, location, auth, auth_count, status
-                FROM UserLocations;
-                `;
-    const [userLocationRows] = await connection.query(selectUserLocationListQuery);
-    return userLocationRows;
-}
-
-// 특정 사용자 프로필 사진 정보 불러오기
-async function selectUserLocationByLocationId(connection, userLocationId) {
-    const selectUserLocationByLocationIdQuery = `
-                SELECT location, auth, auth_count, status
-                FROM UserLocations
-                WHERE UserLocations.id = ?;
-                `;
-    const [userLocationByLocationIdRows] = await connection.query(selectUserLocationByLocationIdQuery, userLocationId);
-    return userLocationByLocationIdRows;
-}
-
-// 특정 사용자 프로필 사진 수정
-async function updateLocation(connection, userLocationId, newLocation, checkAuth, checkAuthCount){
-    // const vari = [newLocation, checkAuth, checkAuthCount];
-    // const updateLocationQuery = `
-    //             UPDATE UserLocations SET
-    //             location = ?, auth = ?, auth_count = ?
-    //             WHERE UserLocations.id = ${userLocationId};
-    //             `;
-    // await connection.query(updateLocationQuery, vari);
-    
-    const updateLocationQuery = `
-                UPDATE UserLocations SET
-                location = ?, auth = ?, auth_count = ?
-                WHERE UserLocations.id = ?;
-                `;
-    await connection.query(updateLocationQuery, userLocationId, newLocation, checkAuth, checkAuthCount);
+    const queryParams = [data, imageId];
+    await connection.query(updateImageQuery, queryParams);
 }
 
 module.exports = {
-    selectUser,
-    selectUserIndex,
-    selectUserId,
-    selectUserNickname,
-    selectUserName,
-    selectUserStatus,
-    selectUserIdCheck,
-    selectUserNicknameCheck,
-    selectUserPassword,
-    selectUserAccount,
-    selectUserPatch,
-    selectUserImage,
-    selectUserImageByImageId,
-    selectUserLocation,
-    selectUserLocationByLocationId,
+    selectAllUser,
+    selectUserByIdx,
+    selectUserById,
+    selectUserByNickname,
+    selectPasswordById,
+    selectImageByImageId,
     insertUserLocation,
     insertUserImage,
-    insertUserInfo,
+    insertUser,
     updateUser,
     updateImage,
-    updateLocation
+    deleteUser
 };
