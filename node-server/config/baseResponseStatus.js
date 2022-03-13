@@ -11,7 +11,7 @@ module.exports = {
     TOKEN_VERIFICATION_FAILURE : { "isSuccess": false, "code": 3000, "message":"JWT 토큰 검증 실패" },
     TOKEN_VERIFICATION_SUCCESS : { "isSuccess": true, "code": 1001, "message":"JWT 토큰 검증 성공" }, // ?
 
-    // User Request error
+    // User Request Error
     SIGNUP_ID_EMPTY : { "isSuccess": false, "code": 2001, "message":"ID를 입력해주세요" },
     SIGNUP_ID_LENGTH : { "isSuccess": false, "code": 2002, "message":"ID는 20자리 미만으로 입력해주세요." },
     SIGNUP_ID_CHARACTER : { "isSuccess": false, "code": 2003, "message":"ID는 특수문자 없이 입력해주세요." },
@@ -37,8 +37,10 @@ module.exports = {
     USER_NICKNAME_EMPTY : { "isSuccess": false, "code": 2023, "message": "변경할 닉네임 값을 입력해주세요" },
     USER_IMAGE_NOT_MATCH : { "isSuccess": false, "code": 2024, "message": "프로필 사진 URL을 확인해주세요" },
     USER_STATUS_EMPTY : { "isSuccess": false, "code": 2025, "message": "회원 상태값을 입력해주세요" },
+    
+    // Badge Request Error
 
-    // User Response error
+    // User Response Error
     SIGNUP_REDUNDANT_ID : { "isSuccess": false, "code": 3001, "message":"중복된 ID 입니다." },
     SIGNUP_REDUNDANT_NICKNAME : { "isSuccess": false, "code": 3002, "message":"중복된 닉네임 입니다." },
     SIGNIN_ID_WRONG : { "isSuccess": false, "code": 3003, "message": "ID가 잘못 되었습니다." },
