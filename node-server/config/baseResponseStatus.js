@@ -38,7 +38,14 @@ module.exports = {
     USER_IMAGE_NOT_MATCH : { "isSuccess": false, "code": 2024, "message": "프로필 사진 URL을 확인해주세요" },
     USER_STATUS_EMPTY : { "isSuccess": false, "code": 2025, "message": "회원 상태값을 입력해주세요" },
     
-    // Badge Request Error
+    // Neighborhood Request Error
+    NEIGHBORHOOD_LOCATION_EMPTY : { "isSuccess": false, "code": 2030, "message": "위치를 입력해주세요" },
+    NEIGHBORHOOD_CONTENT_EMPTY : { "isSuccess": false, "code": 2031, "message": "내용을 입력해주세요" },
+    NEIGHBORHOOD_TOPIC_EMPTY : { "isSuccess": false, "code": 2032, "message": "주제를 입력해주세요" },
+    NEIGHBORHOOD_CONTENT_LENGTH : { "isSuccess": false, "code": 2033, "message": "내용은 20자 이내로 입력해주세요" },
+    NEIGHBORHOOD_TOPIC_NOT_EXIST : { "isSuccess": false, "code": 2034, "message": "해당 주제의 동네 정보가 존재하지 않습니다." },
+    NEIGHBORHOOD_ID_NOT_EXIST : { "isSuccess": false, "code": 2035, "message": "동네 정보가 존재하지 않습니다." },
+    NEIGHBORHOOD_ID_EMPTY : { "isSuccess": false, "code": 2036, "message": "동네 정보 ID를 입력해주세요." },
 
     // User Response Error
     SIGNUP_REDUNDANT_ID : { "isSuccess": false, "code": 3001, "message":"중복된 ID 입니다." },

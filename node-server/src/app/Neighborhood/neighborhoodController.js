@@ -1,272 +1,225 @@
-const userProvider = require("../../app/User/userProvider");
-const userService = require("../../app/User/userService");
+const neighborhoodProvider = require("../../app/Neighborhood/neighborhoodProvider");
+const neighborhoodService = require("../../app/Neighborhood/neighborhoodService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response, errResponse} = require("../../../config/response");
 
-// 특수문자 포함 여부 검증
-function containsSpecialChars(str) {
-    const specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-    return specialChars.test(str);
-}
-
 /*
  * API No. 1
- * API Name : 사용자 생성 (회원가입)
- * [POST] /app/users
+ * API Name : 동네 정보 생성
+ * [POST] /app/neighborhoods
  */
-exports.postUsers = async function (req, res) {
-    const {id, password, name, nickname, location} = req.body;
+exports.postNeighborhoods = async function (req, res) {
+    const userIdx = req.verifiedToken.userIdx;
+    const {location, content, topic} = req.body;
 
     // 빈 값 체크
-    if (!id) {
-        return res.send(errResponse(baseResponse.SIGNUP_ID_EMPTY));
+    if (!location) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_LOCATION_EMPTY));
     }
     
-    if (!password) {
-        return res.send(errResponse(baseResponse.SIGNUP_PASSWORD_EMPTY));
+    if (!content) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_CONTENT_EMPTY));
     }
     
-    if (!name) {
-        return res.send(errResponse(baseResponse.SIGNUP_NAME_EMPTY));
-    }
-    
-    if (!nickname) {
-        return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
+    if (!topic) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_TOPIC_EMPTY));
     }
     
     // 길이 체크
-    if (id.length > 20) {
-        return res.send(errResponse(baseResponse.SIGNUP_ID_LENGTH));
-    }
-    
-    if (password.length < 8 || password.length > 20) {
-        return res.send(errResponse(baseResponse.SIGNUP_PASSWORD_LENGTH));
-    }
-    
-    if (name.length > 10) {
-        return res.send(errResponse(baseResponse.SIGNUP_NAME_LENGTH));
-    }
-    
-    if (nickname.length > 20) {
-        return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_LENGTH));
-    }
-    
-    // 문자열 체크 (특수문자 포함 여부)
-    if (containsSpecialChars(id)) {
-        return res.send(errResponse(baseResponse.SIGNUP_ID_CHARACTER));
-    }
-    if (containsSpecialChars(name)) {
-        return res.send(errResponse(baseResponse.SIGNUP_NAME_CHARACTER));
-    }
-    if (containsSpecialChars(nickname)) {
-        return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_CHARACTER));
+    if (content.length > 20) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_CONTENT_LENGTH));
     }
 
-
-    const signUpResponse = await userService.createUser(
-        id,
-        password,
-        name,
-        nickname,
-        location
+    const postNeighborhoodResponse = await neighborhoodService.createNeighborhood(
+        userIdx,
+        location,
+        content,
+        topic
     );
     
-    // 사용자 생성 실패
-    if (signUpResponse.isSuccess === false) {
-        return res.send(signUpResponse);
+    // 동네 정보 생성 실패
+    if (postNeighborhoodResponse.isSuccess === false) {
+        return res.send(postNeighborhoodResponse);
     }
 
-    // 사용자 생성 성공
-    return res.send(response(baseResponse.POST_SUCCESS, signUpResponse));
+    // 동네 정보 생성 성공
+    return res.send(response(baseResponse.POST_SUCCESS, postNeighborhoodResponse));
 };
 
 /*
  * API No. 2
- * API Name : 사용자 로그인 (JWT 생성)
- * [POST] /app/login
+ * API Name : 특정 주제로 동네 정보 조회
+ * [GET] /app/neighborhoods
  */
-exports.login = async function (req, res) {
-    const {id, password} = req.body;
+exports.getNeighborhoodsByTopic = async function (req, res) {
+    const topic = req.query.topic;
     
-    // 빈 값 체크
-    if (!id) {
-        return res.send(errResponse(baseResponse.SIGNIN_ID_EMPTY));
+    const neighborhoodByTopic = await neighborhoodProvider.getNeighborhoodByTopic(topic);
+    
+    // 동네 정보 조회 실패
+    if (neighborhoodByTopic.length < 1) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_TOPIC_NOT_EXIST));
     }
     
-    if (!password) {
-        return res.send(errResponse(baseResponse.SIGNIN_PASSWORD_EMPTY));
-    }
-    
-    const signInResponse = await userService.signInUser(id, password);
-    
-    // 사용자 로그인 실패
-    if (signInResponse.isSuccess === false) {
-        return res.send(signInResponse);
-    }
-    
-    // 사용자 로그인 성공
-    return res.send(response(baseResponse.POST_SUCCESS, signInResponse));
+    // 동네 정보 조회 성공
+    return res.send(response(baseResponse.GET_SUCCESS, neighborhoodByTopic));
 };
 
 /*
  * API No. 3
- * API Name : 전체 사용자 조회 + nicknmae으로 사용자 조회
- * [GET] /app/users
+ * API Name : id로 동네 정보 조회
+ * [GET] /app/neighborhoods/:neighborhoodId
  */
-exports.getUsers = async function (req, res) {
-    const userNickname = req.query.nickname;
+exports.getNeighborhoods = async function (req, res) {
+    const neighborhoodId = req.params.neighborhoodId;
+
+    const getNeighborhood = await neighborhoodProvider.getNeighborhoods(neighborhoodId);
     
-    if (!userNickname) {
-        // 사용자 전체 조회
-        const userList = await userProvider.getUserList();
-    
-        return res.send(response(baseResponse.GET_SUCCESS, userList));
-    } else {
-        const userByNickname = await userProvider.getUserByNickname(userNickname);
-        
-        // 사용자 조회 실패
-        if (userByNickname.length < 1) {
-            return res.send(errResponse(baseResponse.USER_USERNICKNAME_NOT_EXIST));
-        }
-        
-        // 사용자 조회 성공
-        return res.send(response(baseResponse.GET_SUCCESS, userByNickname));
+    // 특정 동네 정보 조회 실패
+    if (getNeighborhood.length < 1) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_ID_NOT_EXIST));
     }
+    
+    // 특정 동네 정보 조회 성공
+    return res.send(response(baseResponse.GET_SUCCESS, getNeighborhood));
 };
 
 /*
  * API No. 4
- * API Name : 특정 index로 사용자 조회
- * [GET] /app/users/:userIdx
+ * API Name : 동네 정보 수정
+ * [PATCH] /app/neighborhoods/:neighborhoodId
  */
-exports.getUserByIdx = async function (req, res) {
-    const userIdx = req.params.userIdx;
-
-    const userByUserIdx = await userProvider.getUserByIdx(userIdx);
+exports.patchNeighborhoods = async function (req, res) {
+    const userIdx = req.verifiedToken.userIdx;
+    const neighborhoodId = req.params.neighborhoodId;
+    const {content, topic} = req.body;
     
-    // 사용자 조회 실패
-    if (userByUserIdx.length < 1) {
-        return res.send(errResponse(baseResponse.USER_USERIDX_NOT_MATCH));
+    const editNeighborhood = await neighborhoodService.editNeighborhood(
+        userIdx,
+        neighborhoodId,
+        content,
+        topic
+    );
+    // 동네 정보 수정 실패
+    if (editNeighborhood.isSuccess === false) {
+        return res.send(errResponse(editNeighborhood));
     }
     
-    // 사용자 조회 성공
-    return res.send(response(baseResponse.GET_SUCCESS, userByUserIdx));
+    // 동네 정보 수정 성공
+    return res.send(response(baseResponse.PUT_SUCCESS, editNeighborhood));
 };
 
 /*
  * API No. 5
- * API Name : 특정 사용자 수정
- * [PATCH] /app/users/:userIdx
+ * API Name : 동네 정보 삭제
+ * [PUT] /app/neighborhoods/:neighborhoodId
  */
-exports.patchUsers = async function (req, res) {
+exports.deleteNeighborhoods = async function (req, res) {
     const userIdx = req.verifiedToken.userIdx;
-    const {oldPassword, newPassword, nickname} = req.body;
+    const neighborhoodId = req.params.neighborhoodId;
     
-    const editUser = await userService.editUser(
+    const deleteNeighborhood = await neighborhoodService.deleteNeighborhood(
         userIdx,
-        oldPassword,
-        newPassword,
-        nickname,
+        neighborhoodId
     );
-    // 사용자 수정 실패
-    if (editUser.isSuccess === false) {
-        return res.send(errResponse(editUser));
+    // 동네 정보 삭제 실패
+    if (deleteNeighborhood.isSuccess === false) {
+        return res.send(errResponse(deleteNeighborhood));
     }
     
-    // 사용자 수정 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, editUser));
+    // 동네 정보 삭제 성공
+    return res.send(response(baseResponse.PUT_SUCCESS, deleteNeighborhood));
 };
 
 /*
  * API No. 6
- * API Name : 특정 사용자 삭제
- * [PUT] /app/users/:userIdx
+ * API Name : 동네 정보 주제 조회
+ * [GET] /app/neighborhoods/topics
  */
-exports.deleteUsers = async function (req, res) {
-    const userIdx = req.verifiedToken.userIdx;
-    const {password} = req.body;
+exports.getTopics = async function (req, res) {
+    const getTopic = await neighborhoodProvider.getTopic();
     
-    const deleteUser = await userService.deleteUser(
-        userIdx,
-        password,
-    );
-    // 사용자 삭제 실패
-    if (deleteUser.isSuccess === false) {
-        return res.send(deleteUser);
+    // 동네 정보 주제 조회 실패
+    if (getTopic.isSuccess === false) {
+        return res.send(getTopic);
     }
     
-    // 사용자 삭제 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, deleteUser));
+    // 동네 정보 주제 조회 성공
+    return res.send(response(baseResponse.GET_SUCCESS, getTopic));
 };
-
 
 /*
  * API No. 7
- * API Name : 특정 사용자 프로필 사진 조회
- * [GET] /app/users/:userIdx/images
+ * API Name : 동네 정보 사진 생성
+ * [POST] /app/neighborhoods/images
  */
-exports.getImages = async function (req, res) {
-    const userIdx = req.params.userIdx;
+exports.postImages = async function (req, res) {
+    const userIdx = req.verifiedToken.userIdx;
+    const {postId, data} = req.body;
     
-    const imageByUserIdx = await userProvider.getImageByUserIdx(userIdx);
-    
-    // 프로필 사진 조회 실패
-    if (imageByUserIdx.isSuccess === false) {
-        return res.send(imageByUserIdx);
+    // 빈 값 체크
+    if (!postId) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_ID_EMPTY));
     }
     
-    // 프로필 사진 조회 성공
-    return res.send(response(baseResponse.GET_SUCCESS, imageByUserIdx));
-};
+    const postImage = await neighborhoodService.createImage(
+        userIdx,
+        postId,
+        data
+    );
+    
+    // 동네 정보 사진 생성 실패
+    if (postImage.isSuccess === false) {
+        return res.send(postImage);
+    }
+    
+    // 동네 정보 사진 생성 성공
+    return res.send(response(baseResponse.POST_SUCCESS, postImage));
+    
+}
 
 /*
  * API No. 8
- * API Name : 특정 사용자 프로필 사진 수정
- * [PUT] /app/users/:userIdx/images
+ * API Name : 동네 정보 사진 수정
+ * [PATCH] /app/neighborhoods/images
  */
 exports.patchImages = async function (req, res) {
     const userIdx = req.verifiedToken.userIdx;
+    const imageId = req.params.imageId;
     const {data} = req.body;
     
-    const editUserImage = await userService.editUserImage(
+    const editImage = await neighborhoodService.editImage(
         userIdx,
+        imageId,
         data
     );
-    // 프로필 사진 수정 실패
-    if (editUserImage.isSuccess === false) {
-        return res.send(editUserImage);
+    // 동네 정보 사진 수정 실패
+    if (editImage.isSuccess === false) {
+        return res.send(editImage);
     }
     
-    // 프로필 사진 수정 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, editUserImage));
+    // 동네 정보 사진 수정 성공
+    return res.send(response(baseResponse.PUT_SUCCESS, editImage));
 };
-
 
 /*
  * API No. 9
- * API Name : 특정 사용자 프로필 사진 삭제
- * [PUT] /app/users/:userIdx/images
+ * API Name : 동네 정보 사진 삭제
+ * [PUT] /app/neighborhoods/images
  */
 exports.deleteImages = async function (req, res) {
     const userIdx = req.verifiedToken.userIdx;
+    const imageId = req.params.imageId;
     
-    const deleteUserImage = await userService.deleteUserImage(
+    const deleteImage = await neighborhoodService.deleteImage(
         userIdx,
+        imageId
     );
-    // 프로필 사진 삭제 실패
-    if (deleteUserImage.isSuccess === false) {
-        return res.send(deleteUserImage);
+    // 동네 정보 사진 삭제 실패
+    if (deleteImage.isSuccess === false) {
+        return res.send(deleteImage);
     }
     
-    // 프로필 사진 삭제 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, deleteUserImage));
+    // 동네 정보 사진 삭제 성공
+    return res.send(response(baseResponse.PUT_SUCCESS, deleteImage));
 };
-
-/** JWT 토큰 검증 API
- * [GET] /app/auto-login
- */
-// exports.check = async function (req, res) {
-//     const userIdResult = req.verifiedToken.userId;
-//     console.log(userIdResult);
-//     return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS), userIdResult);
-// };

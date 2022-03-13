@@ -8,8 +8,7 @@ const {response, errResponse} = require("../../../config/response");
  * [GET] /app/badges
  */
 exports.getBadgeByUserIdx = async function (req, res) {
-    const userIdx = req.query.userIdx;
-    console.log("goodl");
+    const userIdx = req.verifiedToken.userIdx;
     
     // 빈 값 체크
     if (!userIdx) {
