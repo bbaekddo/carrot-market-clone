@@ -46,6 +46,10 @@ module.exports = {
     NEIGHBORHOOD_TOPIC_NOT_EXIST : { "isSuccess": false, "code": 2034, "message": "해당 주제의 동네 정보가 존재하지 않습니다." },
     NEIGHBORHOOD_ID_NOT_EXIST : { "isSuccess": false, "code": 2035, "message": "동네 정보가 존재하지 않습니다." },
     NEIGHBORHOOD_ID_EMPTY : { "isSuccess": false, "code": 2036, "message": "동네 정보 ID를 입력해주세요." },
+    NEIGHBORHOOD_IDX_NOT_MATCH : { "isSuccess": false, "code": 2037, "message": "동네 정보 작성자가 아닙니다." },
+    NEIGHBORHOOD_STATUS_NOT_MATCH : { "isSuccess": false, "code": 2038, "message": "동네 정보 상태를 확인해주세요." },
+    NEIGHBORHOOD_IMAGE_NOT_EXIST : { "isSuccess": false, "code": 2039, "message": "동네 정보 사진 ID를 확인해주세요." },
+    NEIGHBORHOOD_LOCATION_NOT_EXIST : { "isSuccess": false, "code": 2040, "message": "동네 정보 위치를 확인해주세요." },
 
     // User Response Error
     SIGNUP_REDUNDANT_ID : { "isSuccess": false, "code": 3001, "message":"중복된 ID 입니다." },

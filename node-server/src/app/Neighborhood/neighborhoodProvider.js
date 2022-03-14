@@ -1,67 +1,39 @@
 const { pool } = require("../../../config/database");
 const {logger} = require("../../../config/winston");
-const userDao = require("./neighborhoodDao");
-const {errResponse} = require("../../../config/response");
-const baseResponse = require("../../../config/baseResponseStatus");
+const neighborhoodDao = require("./neighborhoodDao");
 
 // Provider: Read 비즈니스 로직 처리
 
-exports.getUserList = async function () {
+exports.getNeighborhoodByTopic = async function (topic) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userListResult = await userDao.selectAllUser(connection);
+    const topicIdRow = await neighborhoodDao.selectTopicId(connection, topic);
+    const topicId = topicIdRow[0].id;
+    const neighborhoodByTopic = await neighborhoodDao.selectNeighborhoodByTopic(connection, topicId);
     connection.release();
     
-    return userListResult;
+    return neighborhoodByTopic;
 };
 
-exports.getUserByIdx = async function (userIdx) {
+exports.getNeighborhoodById = async function (neighborhoodId) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userIdxResult = await userDao.selectUserByIdx(connection, userIdx);
+    const neighborhoodById = await neighborhoodDao.selectNeighborhoodById(connection, neighborhoodId);
     connection.release();
     
-    return userIdxResult;
+    return neighborhoodById;
 };
 
-exports.getUserById = async function (userId) {
+exports.getTopic = async function () {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userIdResult = await userDao.selectUserById(connection, userId);
+    const topic = await neighborhoodDao.selectAllTopic(connection);
     connection.release();
     
-    return userIdResult;
+    return topic;
 };
 
-exports.getUserByNickname = async function (userNickname) {
+exports.getImageById = async function (imageId) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userNicknameResult = await userDao.selectUserByNickname(connection, userNickname);
+    const image = await neighborhoodDao.selectImageById(connection, imageId);
     connection.release();
     
-    return userNicknameResult;
-};
-
-exports.getImageByUserIdx = async function (userIdx) {
-    const connection = await pool.getConnection(async (conn) => conn);
-    
-    // 사용자 Idx 확인
-    const userRows = await userDao.selectUserByIdx(connection, userIdx);
-    if (userRows.length < 1) {
-        return errResponse(baseResponse.USER_USERIDX_NOT_MATCH);
-    }
-    
-    // 프로필 사진 데이터 불러오기
-    const imageId = userRows[0].profileImg;
-    const imageResult = await userDao.selectImageByImageId(connection, imageId);
-    connection.release();
-    
-    return imageResult;
-};
-
-exports.getPassword = async function (userId) {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const passwordResult = await userDao.selectPasswordById(
-        connection,
-        userId
-    );
-    connection.release();
-    
-    return passwordResult;
+    return image;
 };

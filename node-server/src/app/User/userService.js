@@ -3,6 +3,7 @@ const {pool} = require("../../../config/database");
 const secret_config = require("../../../config/secret");
 const userProvider = require("./userProvider");
 const userDao = require("./userDao");
+const neighborhoodDao = require("../Neighborhood/neighborhoodDao");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {errResponse} = require("../../../config/response");
 const jwt = require("jsonwebtoken");
@@ -33,9 +34,15 @@ exports.createUser = async function (id, password, name, nickname, location) {
         
         try{
             await connection.beginTransaction();
-            // 사용자 위치1 생성 후 Location id 값 받기
-            const userLocation1 = await userDao.insertUserLocation(connection, location);
-            // 사용자 위치2는 미정으로 생성 후 Location id 값 받기
+    
+            // 입력 위치 검색 후 Location ID 값 불러오기
+            const locationIdRow = await neighborhoodDao.selectLocation(connection, location);
+            if (locationIdRow.length < 1) {
+                return errResponse(baseResponse.NEIGHBORHOOD_LOCATION_NOT_EXIST);
+            }
+            // 사용자 위치1 Location id 입력
+            const userLocation1 = await userDao.insertUserLocation(connection, locationIdRow[0].id);
+            // 사용자 위치2는 미정으로 생성 후 Location id 입력
             const userLocation2 = await userDao.insertUserLocation(connection, 1);
             // 사용자 프로필 사진 id 값 받기
             const userProfileImg = await userDao.insertUserImage(connection);

@@ -54,6 +54,11 @@ exports.postNeighborhoods = async function (req, res) {
 exports.getNeighborhoodsByTopic = async function (req, res) {
     const topic = req.query.topic;
     
+    // 빈 값 체크
+    if (!topic) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_TOPIC_EMPTY));
+    }
+    
     const neighborhoodByTopic = await neighborhoodProvider.getNeighborhoodByTopic(topic);
     
     // 동네 정보 조회 실패
@@ -72,8 +77,13 @@ exports.getNeighborhoodsByTopic = async function (req, res) {
  */
 exports.getNeighborhoods = async function (req, res) {
     const neighborhoodId = req.params.neighborhoodId;
-
-    const getNeighborhood = await neighborhoodProvider.getNeighborhoods(neighborhoodId);
+    
+    // 빈 값 체크
+    if (!neighborhoodId) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_ID_EMPTY));
+    }
+    
+    const getNeighborhood = await neighborhoodProvider.getNeighborhoodById(neighborhoodId);
     
     // 특정 동네 정보 조회 실패
     if (getNeighborhood.length < 1) {
@@ -102,7 +112,7 @@ exports.patchNeighborhoods = async function (req, res) {
     );
     // 동네 정보 수정 실패
     if (editNeighborhood.isSuccess === false) {
-        return res.send(errResponse(editNeighborhood));
+        return res.send(editNeighborhood);
     }
     
     // 동네 정보 수정 성공
@@ -124,7 +134,7 @@ exports.deleteNeighborhoods = async function (req, res) {
     );
     // 동네 정보 삭제 실패
     if (deleteNeighborhood.isSuccess === false) {
-        return res.send(errResponse(deleteNeighborhood));
+        return res.send(deleteNeighborhood);
     }
     
     // 동네 정보 삭제 성공
@@ -155,16 +165,17 @@ exports.getTopics = async function (req, res) {
  */
 exports.postImages = async function (req, res) {
     const userIdx = req.verifiedToken.userIdx;
-    const {postId, data} = req.body;
+    const neighborhoodId = req.params.neighborhoodId;
+    const {data} = req.body;
     
     // 빈 값 체크
-    if (!postId) {
+    if (!neighborhoodId) {
         return res.send(errResponse(baseResponse.NEIGHBORHOOD_ID_EMPTY));
     }
     
     const postImage = await neighborhoodService.createImage(
         userIdx,
-        postId,
+        neighborhoodId,
         data
     );
     

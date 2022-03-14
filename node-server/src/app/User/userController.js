@@ -34,6 +34,10 @@ exports.postUsers = async function (req, res) {
         return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
     }
     
+    if (!location) {
+        return res.send(errResponse(baseResponse.NEIGHBORHOOD_LOCATION_EMPTY));
+    }
+    
     // 길이 체크
     if (id.length > 20) {
         return res.send(errResponse(baseResponse.SIGNUP_ID_LENGTH));
