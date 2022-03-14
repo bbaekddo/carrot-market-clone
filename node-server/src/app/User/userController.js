@@ -200,7 +200,7 @@ exports.deleteUsers = async function (req, res) {
     }
     
     // 사용자 삭제 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, deleteUser));
+    return res.send(response(baseResponse.DELETE_SUCCESS, deleteUser));
 };
 
 
@@ -263,7 +263,7 @@ exports.deleteImages = async function (req, res) {
     }
     
     // 프로필 사진 삭제 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, deleteUserImage));
+    return res.send(response(baseResponse.DELETE_SUCCESS, deleteUserImage));
 };
 
 /** JWT 토큰 검증 API

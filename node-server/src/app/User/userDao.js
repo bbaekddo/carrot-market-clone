@@ -4,7 +4,6 @@ const {query} = require("winston");
 
 async function selectAllUser(connection) {
     const selectAllUserQuery = `
-
         SELECT U.idx, U.id, U.name, U.nickname, PI.data AS profileImg,
                U.mannerTemperature, U.retradeRate, U.replyRate,
                L1.name AS location1, L2.name AS location2, U.status

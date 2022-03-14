@@ -138,7 +138,7 @@ exports.deleteNeighborhoods = async function (req, res) {
     }
     
     // 동네 정보 삭제 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, deleteNeighborhood));
+    return res.send(response(baseResponse.DELETE_SUCCESS, deleteNeighborhood));
 };
 
 /*
@@ -232,5 +232,5 @@ exports.deleteImages = async function (req, res) {
     }
     
     // 동네 정보 사진 삭제 성공
-    return res.send(response(baseResponse.PUT_SUCCESS, deleteImage));
+    return res.send(response(baseResponse.DELETE_SUCCESS, deleteImage));
 };

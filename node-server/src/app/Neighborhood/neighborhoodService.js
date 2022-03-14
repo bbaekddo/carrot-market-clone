@@ -35,7 +35,7 @@ exports.createNeighborhood = async function (userIdx, location, content, topic) 
     
         connection.release();
         
-        return {'user': userIdx, 'neighborhoodId': neighborhoodId};
+        return {'userIdx': userIdx, 'neighborhoodId': neighborhoodId};
     } catch (err) {
         logger.error(`App - createNeighborhood Service error\n: ${err.message}`);
         
@@ -133,7 +133,7 @@ exports.createImage = async function (userIdx, neighborhoodId, data) {
         
         connection.release();
         
-        return {'user': userIdx, 'neighborhoodId': neighborhoodId};
+        return {'userIdx': userIdx, 'neighborhoodId': neighborhoodId};
     } catch (err) {
         logger.error(`App - createImage Service error\n: ${err.message}`);
         
