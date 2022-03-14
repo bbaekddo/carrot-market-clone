@@ -47,7 +47,7 @@ module.exports = function(app){
             display: 'popup'
         });
         
-        const facebookUrl = `https://www.facebook.com/v12.0/dialog/oauth?${stringfiedParams}`;
+        const facebookUrl = `https://www.facebook.com/v4.0/dialog/oauth?${stringfiedParams}`;
         res.type('text/html').status(200).send(`
             <!DOCTYPE html>
             <html>
@@ -73,6 +73,19 @@ module.exports = function(app){
         });
         console.log(data);
         return data.access_token;
+    }
+    
+    async function getFacebookUserData(access_token) {
+        const {data} = await ax({
+            url: 'https://graph.facebook.com/me',
+            method: 'get',
+            params: {
+                fields: ['id', 'email', 'name'].join(','),
+                access_token: accesstoken
+            },
+        });
+        console.log(data);
+        return data;
     }
     
     app.get('/app/users/auth/callback', async(req, res) => {
