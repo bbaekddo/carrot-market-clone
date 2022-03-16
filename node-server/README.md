@@ -57,10 +57,10 @@ DB에서 검증해야 하는 의미적 Validation은 Provider 혹은 Service에�
 ├── src                     			# 
 │   ├── app              				# 앱에 대한 코드 작성
 │ 	│   ├── User            			# User 도메인 폴더
-│   │ 	│   ├── neighborhoodDao.js          	# User 관련 데이터베이스
-│ 	│ 	│   ├── neighborhoodController.js 		# req, res 처리
-│ 	│ 	│   ├── neighborhoodProvider.js   		# R에 해당하는 서버 로직 처리
-│ 	│ 	│   ├── neighborhoodService.js   		# CUD에 해당하는 서버 로직 처리   
+│   │ 	│   ├── itemDao.js          	# User 관련 데이터베이스
+│ 	│ 	│   ├── itemController.js 		# req, res 처리
+│ 	│ 	│   ├── itemProvider.js   		# R에 해당하는 서버 로직 처리
+│ 	│ 	│   ├── itemService.js   		# CUD에 해당하는 서버 로직 처리   
 ├── .gitignore                     		# git 에 포함되지 않아야 하는 폴더, 파일들을 작성 해놓는 곳
 ├── index.js                            # 포트 설정 및 시작 파일                     		
 ├── * package-lock.json              	 

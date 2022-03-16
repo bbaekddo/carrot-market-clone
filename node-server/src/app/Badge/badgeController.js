@@ -1,4 +1,4 @@
-const badgeProvider = require("../../app/Badges/badgeProvider");
+const badgeProvider = require(".//badgeProvider");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response, errResponse} = require("../../../config/response");
 

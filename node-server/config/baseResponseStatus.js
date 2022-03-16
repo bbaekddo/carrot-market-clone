@@ -50,6 +50,26 @@ module.exports = {
     NEIGHBORHOOD_STATUS_NOT_MATCH : { "isSuccess": false, "code": 2038, "message": "동네 정보 상태를 확인해주세요." },
     NEIGHBORHOOD_IMAGE_NOT_EXIST : { "isSuccess": false, "code": 2039, "message": "동네 정보 사진 ID를 확인해주세요." },
     NEIGHBORHOOD_LOCATION_NOT_EXIST : { "isSuccess": false, "code": 2040, "message": "동네 정보 위치를 확인해주세요." },
+    
+    // Item Request Error
+    ITEM_NAME_EMPTY : { "isSuccess": false, "code": 2050, "message":"상품 이름을 입력해주세요." },
+    ITEM_CATEGORY_EMPTY : { "isSuccess": false, "code": 2051, "message":"상품 카테고리를 입력해주세요." },
+    ITEM_PRICE_EMPTY : { "isSuccess": false, "code": 2052, "message":"상품 가격을 입력해주세요." },
+    ITEM_LOCATION_EMPTY : { "isSuccess": false, "code": 2053, "message":"상품 위치를 입력해주세요." },
+    ITEM_NAME_LENGTH : { "isSuccess": false, "code": 2054, "message":"상품 이름은 20자 이내로 입력해주세요." },
+    ITEM_CONTENT_LENGTH : { "isSuccess": false, "code": 2055, "message":"상품 내용은 20자 이내로 입력해주세요." },
+    ITEM_PRICE_TYPE_WRONG : { "isSuccess": false, "code": 2056, "message":"상품 가격은 숫자만 입력해주세요." },
+    ITEM_CATEGORY_NOT_EXIST : { "isSuccess": false, "code": 2057, "message":"카테고리와 일치한 상품을 찾을 수 없습니다." },
+    ITEM_ID_EMPTY : { "isSuccess": false, "code": 2058, "message":"상품 ID를 입력해주세요." },
+    ITEM_IMAGE_EMPTY : { "isSuccess": false, "code": 2059, "message":"상품 사진을 입력해주세요." },
+    ITEM_LOCATION_NOT_EXIST : { "isSuccess": false, "code": 2060, "message":"상품 위치를 확인해주세요." },
+    ITEM_ID_NOT_MATCH : { "isSuccess": false, "code": 2061, "message":"상품 ID를 확인해주세요." },
+    ITEM_USER_NOT_MATCH : { "isSuccess": false, "code": 2062, "message":"상품 작성자가 아닙니다." },
+    ITEM_ITEMPOST_NOT_MATCH : { "isSuccess": false, "code": 2063, "message":"게시글 ID를 확인해주세요." },
+    ITEM_ITEMPOST_NOT_EXIST : { "isSuccess": false, "code": 2064, "message":"게시글을 찾을 수 없습니다." },
+    
+    // Category Request Error
+    CATEGORY_NOT_EXIST : { "isSuccess": false, "code": 2080, "message":"설정된 카테고리가 없습니다." },
 
     // User Response Error
     SIGNUP_REDUNDANT_ID : { "isSuccess": false, "code": 3001, "message":"중복된 ID 입니다." },

@@ -3,6 +3,12 @@ module.exports = function(app){
     const jwtMiddleware = require('../../../config/jwtMiddleware');
     const qs = require('querystring');
     const ax = require('axios');
+    
+    const client_id = 'n7RTkWcgkwzvV71Fb0oN';
+    const client_secret = '7eMnwfnu8s';
+    let state = "RANDOM_STATE";
+    const redirectURI = encodeURI('http://localhost:3000/app/users/auth/callback');
+    let api_url = "";
 
     // 1. 사용자 생성 (회원가입)
     app.post('/app/users', user.postUsers);
@@ -37,7 +43,7 @@ module.exports = function(app){
     // app.get('/app/auto-login', jwtMiddleware, user.check);
     
     // Facebook OAuth 인증
-    app.get('/app/users/login/facebook', (req, res) => {
+    /*app.get('/app/users/login/facebook', (req, res) => {
         const stringfiedParams = qs.stringify({
             client_id: "420065332493079",
             redirect_uri: "https://www.sosocamp.shop/app/users/auth/callback",
@@ -72,7 +78,6 @@ module.exports = function(app){
             },
         });
         console.log(data);
-        return data.access_token;
     }
     
     async function getFacebookUserData(access_token) {
@@ -92,7 +97,46 @@ module.exports = function(app){
         const acceess_token = await getAccessTokenFromCode(req.query.code);
         console.log(acceess_token);
         res.send("authentification success!");
+    });*/
+    
+    app.get('/naverlogin', function (req, res) {
+        api_url = 'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=' + client_id + '&redirect_uri=' + redirectURI + '&state=' + state;
+        res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'});
+        res.end("<a href='"+ api_url + "'><img height='50' src='http://static.nid.naver.com/oauth/small_g_in.PNG'/></a>");
     });
+    
+    // Naver API 토큰 저장용
+    let accessToken = '', refreshToken = '', expiresIn = '';
+    
+    app.get('/app/users/auth/callback', function (req, res) {
+        let code = req.query.code;
+        state = req.query.state;
+        api_url = 'https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id='
+            + client_id + '&client_secret=' + client_secret + '&redirect_uri=' + redirectURI + '&code=' + code + '&state=' + state;
+        var request = require('request');
+        var options = {
+            url: api_url,
+            headers: {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret': client_secret}
+        };
+        request.get(options, function (error, response, body) {
+            if (!error && response.statusCode === 200) {
+                // Naver API로부터 받은 토큰 저장
+                const resultObj = JSON.parse(body);
+                accessToken = resultObj.access_token;
+                refreshToken = resultObj.refresh_token;
+                expiresIn = resultObj.expires_in;
+                
+                res.writeHead(200, {'Content-Type': 'text/json;charset=utf-8'});
+                res.end(body);
+            } else {
+                res.status(response.statusCode).end();
+                console.log('error = ' + response.statusCode);
+            }
+        });
+    });
+    
+    
+    
 };
 
 
