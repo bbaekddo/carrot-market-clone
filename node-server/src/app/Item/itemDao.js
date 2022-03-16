@@ -13,9 +13,10 @@ async function selectCategoryId(connection, category) {
 // 카테고리로 상품 조회
 async function selectItemByCategory(connection, categoryId) {
     const selectItemByCategoryQuery = `
-        SELECT name, content, price, location, lookupCount, proposal
-        FROM Items
-        WHERE Items.category = ?;
+        SELECT I.name AS name, content, price, L.name AS location, lookupCount, proposal
+        FROM Items AS I, Locations AS L
+        WHERE I.location = L.id AND
+              I.category = ?;
     `;
     const [itemRows] = await connection.query(selectItemByCategoryQuery, categoryId);
     return itemRows;
@@ -97,6 +98,28 @@ async function selectLocation(connection, location) {
     return locationIdRows;
 }
 
+// 상품 사진 조회
+async function selectImageByItemId(connection, itemId) {
+    const selectImageByItemIdQuery = `
+        SELECT id, data, titleImage
+        FROM ItemImages
+        WHERE item = ?;
+    `;
+    const [imageByItemId] = await connection.query(selectImageByItemIdQuery, itemId);
+    return imageByItemId;
+}
+
+// 관심 목록 조회
+async function selectWatchlistByItemId(connection, itemId) {
+    const selectWatchlistByItemIdQuery = `
+        SELECT id, buyer
+        FROM Watchlists
+        WHERE item = ?;
+    `;
+    const [watchlistByItemId] = await connection.query(selectWatchlistByItemIdQuery, itemId);
+    return watchlistByItemId;
+}
+
 /////////// INSERT ///////////
 // 상품 생성
 async function insertItem(connection, itemParams) {
@@ -158,12 +181,21 @@ async function deleteItempostByItemId(connection, itemId) {
 }
 
 // 상품 ID로 사진 삭제
-async function deleteImageByItemID(connection, itemId) {
+async function deleteImageByItemId(connection, itemId) {
     const deleteImageByItemIdQuery = `
         DELETE FROM ItemImages
         WHERE item = ?;
     `;
     await connection.query(deleteImageByItemIdQuery, itemId);
+}
+
+// 상품 ID로 관심 목록 삭제
+async function deleteWatchlistByItemId(connection, itemId) {
+    const deleteWatchlistByItemIdQuery = `
+        DELETE FROM Watchlists
+        WHERE item = ?;
+    `;
+    await connection.query(deleteWatchlistByItemIdQuery, itemId);
 }
 
 // 상품 삭제
@@ -212,12 +244,16 @@ module.exports = {
     selectItempostByItemId,
     selectItempostByImageId,
     selectLocation,
+    selectImageByItemId,
+    selectWatchlistByItemId,
     insertItem,
     insertItemPost,
     insertImage,
     insertWatchlist,
     updateItem,
     deleteItempostByItemId,
+    deleteImageByItemId,
+    deleteWatchlistByItemId,
     deleteItem,
     updateImage,
     deleteImage,

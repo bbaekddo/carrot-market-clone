@@ -8,7 +8,7 @@ module.exports = function(app){
     // 2. 카테고리로 상품 조회
     app.get('/app/items', item.getItemsByCategory);
     
-    // 3. 게시글 ID로 상품 조회
+    // 3. 게시글 ID로 게시글 조회
     app.get('/app/items/:itempostId', item.getItemsByItempostId);
     
     // 4. 상품 수정

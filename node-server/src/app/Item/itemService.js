@@ -43,7 +43,7 @@ exports.createItem = async function (userIdx, name, category, content, price, lo
             
             await connection.commit();
     
-            return {'postId': itempostId, 'seller': userIdx, 'itemId': itemId};
+            return {'postId': itempostId, 'seller': userIdx, 'itemId': Number(itemId)};
         } catch (err) {
             await connection.rollback();
             
@@ -86,7 +86,9 @@ exports.editItem = async function (userIdx, itemId, name, category, content, pri
         await itemDao.updateItem(connection, itemParams);
         connection.release();
         
-        return {'userIdx': userIdx, 'itemId': itemId};
+        const numberItemId = Number(itemId);
+        
+        return {'userIdx': userIdx, 'itemId': Number(itemId)};
     } catch (err) {
         logger.error(`App - editItem Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
@@ -109,17 +111,36 @@ exports.deleteItem = async function (userIdx, itemId) {
             return errResponse(baseResponse.ITEM_USER_NOT_MATCH);
         }
         
+        // 상품 사진 확인
+        const itemImageRow = await itemDao.selectImageByItemId(connection, itemId);
+        let checkDeleteImage = true;
+        if (itemImageRow.length < 1) {
+            checkDeleteImage = false;
+        }
+        
+        // 관심 목록 확인
+        const watchlistRow = await itemDao.selectWatchlistByItemId(connection, itemId);
+        let checkDeleteWatchlist = true;
+        if (watchlistRow.length < 1) {
+            checkDeleteWatchlist = false;
+        }
+        
         try {
             await connection.beginTransaction();
     
             // 상품 삭제
             await itemDao.deleteItempostByItemId(connection, itemId);
-            await itemDao.deleteImageByItemId(connection, itemId);
+            if (checkDeleteImage) {
+                await itemDao.deleteImageByItemId(connection, itemId);
+            }
+            if (checkDeleteWatchlist) {
+                await itemDao.deleteWatchlistByItemId(connection, itemId);
+            }
             await itemDao.deleteItem(connection, itemId);
             
             await connection.commit();
     
-            return {'userIdx': userIdx, 'itemId': itemId};
+            return {'userIdx': userIdx, 'itemId': Number(itemId)};
         } catch (err) {
             await connection.rollback();
             
@@ -155,7 +176,7 @@ exports.createItemImage = async function (userIdx, itemId, data, titleImage) {
         
         connection.release();
         
-        return {'userIdx': userIdx, 'itemId': itemId};
+        return {'userIdx': userIdx, 'itemId': Number(itemId)};
     } catch (err) {
         logger.error(`App - createItemImage Service error\n: ${err.message}`);
         
@@ -168,6 +189,7 @@ exports.editItemImage = async function (userIdx, imageId, data) {
         const connection = await pool.getConnection(async (conn) => conn);
     
         // 현재 상품 확인
+        const itempostRows = await itemDao.selectItempostByImageId(connection, imageId);
         if (itempostRows.length < 1) {
             return errResponse(baseResponse.ITEM_ID_NOT_MATCH);
         }
@@ -184,7 +206,7 @@ exports.editItemImage = async function (userIdx, imageId, data) {
     
         connection.release();
     
-        return {'userIdx': userIdx, 'imageId': imageId};
+        return {'userIdx': userIdx, 'imageId': Number(imageId)};
     } catch (err) {
         logger.error(`App - editItemImage Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
@@ -212,7 +234,7 @@ exports.deleteItemImage = async function (userIdx, imageId) {
     
         connection.release();
     
-        return {'userIdx': userIdx, 'imageId': imageId};
+        return {'userIdx': userIdx, 'imageId': Number(imageId)};
     } catch (err) {
         logger.error(`App - deleteImage Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
@@ -242,7 +264,7 @@ exports.createWatchlist = async function (userIdx, itemId) {
         
         connection.release();
         
-        return {'itemId': itemId, 'buyer': userNickname};
+        return {'itemId': Number(itemId), 'buyer': userNickname};
     } catch (err) {
         logger.error(`App - createWatchlist Service error\n: ${err.message}`);
         
@@ -250,7 +272,7 @@ exports.createWatchlist = async function (userIdx, itemId) {
     }
 }
 
-exports.deleteWatchlist = async function (userIdx, imageId) {
+exports.deleteWatchlist = async function (userIdx, itemId) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
     
@@ -268,12 +290,12 @@ exports.deleteWatchlist = async function (userIdx, imageId) {
         }
         
         // 관심 목록 삭제
-        const deleteParams = [imageId, userIdx];
+        const deleteParams = [itemId, userIdx];
         await itemDao.deleteWatchlist(connection, deleteParams);
         
         connection.release();
         
-        return {'imageId': imageId, "buyer": userNickname};
+        return {'imageId': Number(itemId), "buyer": userNickname};
     } catch (err) {
         logger.error(`App - deleteWatchlist Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
