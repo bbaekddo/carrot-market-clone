@@ -1,14 +1,8 @@
 module.exports = function(app){
     const user = require('./userController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
-    const qs = require('querystring');
-    const ax = require('axios');
-    
-    const client_id = 'n7RTkWcgkwzvV71Fb0oN';
-    const client_secret = '7eMnwfnu8s';
-    let state = "RANDOM_STATE";
-    const redirectURI = encodeURI('http://localhost:3000/app/users/auth/callback');
-    let api_url = "";
+    const FB = require('fb');
+    const fs = require('fs');
 
     // 1. 사용자 생성 (회원가입)
     app.post('/app/users', user.postUsers);
@@ -38,11 +32,15 @@ module.exports = function(app){
     // 9. 특정 사용자 프로필 사진 삭제 (JWT 사용)
     app.put('/app/users/images', jwtMiddleware, user.deleteImages);
     
-    // TODO: 자동로그인 API (JWT 검증 및 Payload 내뱉기)
-    // JWT 검증 API
-    // app.get('/app/auto-login', jwtMiddleware, user.check);
-    
     // Facebook OAuth 인증
+    
+    app.get('/app/users/login/check', (req, res) => {
+        fs.readFile(`${__dirname}/loginFB.html`, function (err, data) {
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.end(data);
+        });
+    });
+    
     /*app.get('/app/users/login/facebook', (req, res) => {
         const stringfiedParams = qs.stringify({
             client_id: "420065332493079",
@@ -97,48 +95,14 @@ module.exports = function(app){
         const acceess_token = await getAccessTokenFromCode(req.query.code);
         console.log(acceess_token);
         res.send("authentification success!");
-    });*/
-    
-    app.get('/naverlogin', function (req, res) {
-        api_url = 'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=' + client_id + '&redirect_uri=' + redirectURI + '&state=' + state;
-        res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'});
-        res.end("<a href='"+ api_url + "'><img height='50' src='http://static.nid.naver.com/oauth/small_g_in.PNG'/></a>");
     });
     
-    // Naver API 토큰 저장용
-    let accessToken = '', refreshToken = '', expiresIn = '';
-    
-    app.get('/app/users/auth/callback', function (req, res) {
-        let code = req.query.code;
-        state = req.query.state;
-        api_url = 'https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id='
-            + client_id + '&client_secret=' + client_secret + '&redirect_uri=' + redirectURI + '&code=' + code + '&state=' + state;
-        var request = require('request');
-        var options = {
-            url: api_url,
-            headers: {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret': client_secret}
-        };
-        request.get(options, function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                // Naver API로부터 받은 토큰 저장
-                const resultObj = JSON.parse(body);
-                accessToken = resultObj.access_token;
-                refreshToken = resultObj.refresh_token;
-                expiresIn = resultObj.expires_in;
-                
-                res.writeHead(200, {'Content-Type': 'text/json;charset=utf-8'});
-                res.end(body);
-            } else {
-                res.status(response.statusCode).end();
-                console.log('error = ' + response.statusCode);
-            }
-        });
-    });
-    
-    
-    
+    FB.api(
+        '/me',
+        'GET',
+        {"fields":"id,name,email,hometown,location,age_range,photos{picture}"},
+        function(response) {
+            // Insert your code here
+        }
+    );*/
 };
-
-
-
-// TODO: 탈퇴하기 API

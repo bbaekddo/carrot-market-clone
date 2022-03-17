@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Facebook</title>
+</head>
+<body>
+    <h1>Hello!</h1>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId            : '420065332493079',
+                autoLogAppEvents : true,
+                xfbml            : true,
+                version          : 'v13.0'
+            });
+
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        };
+
+    </script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/ko_KR/sdk.js"></script>
+</body>
+</html>
